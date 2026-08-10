@@ -18,14 +18,17 @@ public class UserService :
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordService _passwordService;
+    private readonly IAuthenticationService _authenticationService;
 
     public UserService(
         IUserRepository repository,
-        IPasswordService passwordService)
+        IPasswordService passwordService,
+        IAuthenticationService authenticationService)
         : base(repository)
     {
         _repository = repository;
         _passwordService = passwordService;
+        _authenticationService = authenticationService;
     }
 
     public override async Task<UserResponse> CreateAsync(
@@ -105,17 +108,49 @@ public class UserService :
 
     public async Task<UserResponse> GetMeAsync()
     {
-        throw new NotImplementedException();
+        var user = await _authenticationService
+                .GetAuthenticatedUserAsync();
+
+        return UserMapper.ToResponse(user);
     }
 
     public async Task<UserResponse> UpdateMeAsync(
         UserUpdateRequest request)
     {
-        throw new NotImplementedException();
+        var user =
+            await _authenticationService
+                .GetAuthenticatedUserAsync();
+
+        if (request.Email is not null)
+        {
+            var existingUser =
+                await _repository.GetByEmailAsync(request.Email);
+
+            if (existingUser is not null &&
+                existingUser.Id != user.Id)
+            {
+                throw new InvalidOperationException(
+                    "Email already registered");
+            }
+        }
+
+        UserMapper.UpdateEntity(user, request);
+
+        _repository.Update(user);
+
+        await _repository.SaveChangesAsync();
+
+        return UserMapper.ToResponse(user);
     }
 
     public async Task DeleteMeAsync()
     {
-        throw new NotImplementedException();
+        var user =
+            await _authenticationService
+                .GetAuthenticatedUserAsync();
+
+        _repository.Delete(user);
+
+        await _repository.SaveChangesAsync();
     }
 }

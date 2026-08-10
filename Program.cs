@@ -20,8 +20,7 @@ public class Program
             });
 
         builder.Services.AddOpenApi();
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerConfiguration();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
@@ -48,11 +47,7 @@ public class Program
 
         app.MapControllers();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+        app.UseSwaggerConfiguration();
 
         app.Run();
     }
