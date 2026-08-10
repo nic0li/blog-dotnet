@@ -33,6 +33,8 @@ public class Program
         builder.Services.AddSecurity(
             builder.Configuration);
 
+        builder.Services.AddExceptionHandling();
+
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -41,6 +43,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseExceptionHandling();
 
         app.UseAuthentication();
         app.UseAuthorization();

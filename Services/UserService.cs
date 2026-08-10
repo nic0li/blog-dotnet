@@ -1,5 +1,6 @@
 ﻿using Blog.DTOs.User;
 using Blog.Entities;
+using Blog.Exceptions;
 using Blog.Mappers;
 using Blog.Repositories;
 using Blog.Security.Interfaces;
@@ -135,7 +136,7 @@ public class UserService :
 
         if (emailAlreadyExists && emailBelongsToAnotherUser)
         {
-            throw new InvalidOperationException(
+            throw new BadRequestException(
                 "Email already registered");
         }
     }

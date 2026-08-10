@@ -1,4 +1,5 @@
 ﻿using Blog.Entities;
+using Blog.Exceptions;
 using Blog.Repositories.Interfaces;
 using Blog.Services.Interfaces;
 
@@ -28,7 +29,7 @@ public abstract class CrudService<
 
         if (entity is null)
         {
-            throw new KeyNotFoundException(
+            throw new NotFoundException(
                 $"{typeof(Entity).Name} not found");
         }
 

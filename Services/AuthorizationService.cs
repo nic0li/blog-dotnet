@@ -1,5 +1,6 @@
 ﻿using Blog.Entities;
 using Blog.Enums;
+using Blog.Exceptions;
 using Blog.Services.Interfaces;
 
 namespace Blog.Services;
@@ -40,7 +41,7 @@ public class AuthorizationService : IAuthorizationService
     {
         if (!await IsOwnerAsync(resourceOwner))
         {
-            throw new UnauthorizedAccessException(
+            throw new ForbiddenException(
                 "You are not allowed to modify this resource");
         }
     }
@@ -49,7 +50,7 @@ public class AuthorizationService : IAuthorizationService
     {
         if (!await IsAdminAsync())
         {
-            throw new UnauthorizedAccessException(
+            throw new ForbiddenException(
                 "Administrator privileges required");
         }
     }
@@ -63,7 +64,7 @@ public class AuthorizationService : IAuthorizationService
         if (!IsOwner(resourceOwner, authenticatedUser) &&
             !IsAdmin(authenticatedUser))
         {
-            throw new UnauthorizedAccessException(
+            throw new ForbiddenException(
                 "You are not allowed to modify this resource");
         }
     }
