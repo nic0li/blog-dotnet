@@ -38,6 +38,9 @@ public class AppDbContext : DbContext
 
             entity.Property(user => user.Password)
                 .IsRequired();
+
+            entity.Property(user => user.Role)
+                .HasConversion<string>();
         });
     }
 

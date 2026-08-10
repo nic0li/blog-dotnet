@@ -2,6 +2,7 @@
 using Blog.Data;
 using Blog.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace Blog;
 
@@ -11,7 +12,12 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(
+                    new JsonStringEnumConverter());
+            });
 
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
