@@ -17,7 +17,7 @@ public class CategoryRepository : Repository<Category>, ICategoryRepository
             .FirstOrDefaultAsync(category => category.Name == name);
     }
 
-    public async Task<IEnumerable<Category>> GetByNameContainingAsync(
+    public async Task<IEnumerable<Category>> GetAllByNameContainingAsync(
         string name)
     {
         return await _dbContext.Categories
