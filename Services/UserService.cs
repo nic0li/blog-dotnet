@@ -18,30 +18,22 @@ public class UserService :
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordService _passwordService;
-    private readonly IAuthenticationService _authenticationService;
+    private readonly IAuthorizationService _authorizationService;
 
     public UserService(
         IUserRepository repository,
         IPasswordService passwordService,
-        IAuthenticationService authenticationService)
+        IAuthorizationService authorizationService)
         : base(repository)
     {
         _repository = repository;
         _passwordService = passwordService;
-        _authenticationService = authenticationService;
+        _authorizationService = authorizationService;
     }
 
-    public override async Task<UserResponse> CreateAsync(
-        UserCreateRequest request)
+    public override async Task<UserResponse> CreateAsync(UserCreateRequest request)
     {
-        var existingUser =
-            await _repository.GetByEmailAsync(request.Email);
-
-        if (existingUser is not null)
-        {
-            throw new InvalidOperationException(
-                "Email already registered");
-        }
+        await ValidateEmailAvailabilityAsync(request.Email, null);
 
         var user = UserMapper.CreateEntity(request);
 
@@ -54,45 +46,25 @@ public class UserService :
         return UserMapper.ToResponse(user);
     }
 
-    public override async Task<UserResponse> UpdateAsync(
-        long id,
-        UserUpdateRequest request)
+    public override async Task<UserResponse> UpdateAsync(long id, UserUpdateRequest request)
     {
         var user = await GetEntityByIdAsync(id);
 
-        if (request.Email is not null)
-        {
-            var existingUser =
-                await _repository.GetByEmailAsync(request.Email);
+        await _authorizationService.ValidateOwnerOrAdminAsync(user);
 
-            if (existingUser is not null &&
-                existingUser.Id != user.Id)
-            {
-                throw new InvalidOperationException(
-                    "Email already registered");
-            }
-        }
-
-        UserMapper.UpdateEntity(user, request);
-
-        _repository.Update(user);
-
-        await _repository.SaveChangesAsync();
-
-        return UserMapper.ToResponse(user);
+        return await UpdateUserAsync(user, request);
     }
 
     public override async Task DeleteAsync(long id)
     {
         var user = await GetEntityByIdAsync(id);
 
-        _repository.Delete(user);
+        await _authorizationService.ValidateOwnerOrAdminAsync(user);
 
-        await _repository.SaveChangesAsync();
+        await DeleteUserAsync(user);
     }
 
-    public override async Task<UserViewResponse> GetByIdAsync(
-        long id)
+    public override async Task<UserViewResponse> GetByIdAsync(long id)
     {
         var user = await GetEntityByIdAsync(id);
 
@@ -108,31 +80,28 @@ public class UserService :
 
     public async Task<UserResponse> GetMeAsync()
     {
-        var user = await _authenticationService
-                .GetAuthenticatedUserAsync();
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
 
         return UserMapper.ToResponse(user);
     }
 
-    public async Task<UserResponse> UpdateMeAsync(
-        UserUpdateRequest request)
+    public async Task<UserResponse> UpdateMeAsync(UserUpdateRequest request)
     {
-        var user =
-            await _authenticationService
-                .GetAuthenticatedUserAsync();
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
 
-        if (request.Email is not null)
-        {
-            var existingUser =
-                await _repository.GetByEmailAsync(request.Email);
+        return await UpdateUserAsync(user, request);
+    }
 
-            if (existingUser is not null &&
-                existingUser.Id != user.Id)
-            {
-                throw new InvalidOperationException(
-                    "Email already registered");
-            }
-        }
+    public async Task DeleteMeAsync()
+    {
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
+
+        await DeleteUserAsync(user);
+    }
+
+    private async Task<UserResponse> UpdateUserAsync(User user, UserUpdateRequest request)
+    {
+        await ValidateEmailAvailabilityAsync(request.Email, user.Id);
 
         UserMapper.UpdateEntity(user, request);
 
@@ -143,14 +112,31 @@ public class UserService :
         return UserMapper.ToResponse(user);
     }
 
-    public async Task DeleteMeAsync()
+    private async Task DeleteUserAsync(User user)
     {
-        var user =
-            await _authenticationService
-                .GetAuthenticatedUserAsync();
-
         _repository.Delete(user);
 
         await _repository.SaveChangesAsync();
+    }
+
+    private async Task ValidateEmailAvailabilityAsync(string? email, long? userId)
+    {
+        if (email is null)
+        {
+            return;
+        }
+
+        var userByEmail = await _repository.GetByEmailAsync(email);
+
+        var emailAlreadyExists = userByEmail is not null;
+
+        var emailBelongsToAnotherUser = emailAlreadyExists &&
+            userByEmail!.Id != userId;
+
+        if (emailAlreadyExists && emailBelongsToAnotherUser)
+        {
+            throw new InvalidOperationException(
+                "Email already registered");
+        }
     }
 }
