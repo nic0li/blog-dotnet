@@ -2,12 +2,11 @@
 
 namespace Blog.Services.Interfaces;
 
-public interface IUserService :
-        ICrudService<
-        UserResponse,
-        UserViewResponse,
-        UserCreateRequest,
-        UserUpdateRequest>
+public interface IUserService : ICrudService<
+    UserResponse,
+    UserViewResponse,
+    UserCreateRequest,
+    UserUpdateRequest>
 {
     Task<IEnumerable<UserViewResponse>> GetAllAsync();
 

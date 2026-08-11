@@ -8,27 +8,19 @@ namespace Blog.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthenticationController : ControllerBase
+public class AuthenticationController(
+    IAuthenticationService authenticationService,
+    IUserService userService) : ControllerBase
 {
-    private readonly IAuthenticationService _authenticationService;
+    private readonly IAuthenticationService _authenticationService = authenticationService;
     
-    private readonly IUserService _userService;
-
-    public AuthenticationController(
-        IAuthenticationService authenticationService,
-        IUserService userService)
-    {
-        _authenticationService = authenticationService;
-        _userService = userService;
-    }
+    private readonly IUserService _userService = userService;
 
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<LoginResponse>> Login(
-        LoginRequest request)
+    public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
     {
-        var response = await _authenticationService
-            .AuthenticateAsync(request);
+        var response = await _authenticationService.AuthenticateAsync(request);
 
         return Ok(response);
     }

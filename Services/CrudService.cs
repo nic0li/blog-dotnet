@@ -23,7 +23,7 @@ public abstract class CrudService<
         Repository = repository;
     }
 
-    protected async Task<Entity> GetEntityByIdAsync(long id)
+    public async Task<Entity> GetEntityByIdAsync(long id)
     {
         var entity = await Repository.GetByIdAsync(id);
 

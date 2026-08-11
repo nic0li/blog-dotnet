@@ -1,4 +1,4 @@
-﻿using Blog.Repositories;
+﻿using Blog.Repositories.Interfaces;
 using Blog.Security;
 using Blog.Security.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

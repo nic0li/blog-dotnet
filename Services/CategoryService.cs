@@ -2,42 +2,31 @@
 using Blog.Entities;
 using Blog.Exceptions;
 using Blog.Mappers;
-using Blog.Repositories;
+using Blog.Repositories.Interfaces;
 using Blog.Services.Interfaces;
 
 namespace Blog.Services;
 
-public class CategoryService : CrudService<
+public class CategoryService(
+    ICategoryRepository repository,
+    IAuthorizationService authorizationService) : CrudService<
     Category,
     CategoryResponse,
     CategoryResponse,
     CategoryRequest,
-    CategoryRequest>,
+    CategoryRequest>(repository),
     ICategoryService
 {
-    private readonly ICategoryRepository _repository;
-    private readonly IAuthorizationService _authorizationService;
+    private readonly ICategoryRepository _repository = repository;
+    private readonly IAuthorizationService _authorizationService = authorizationService;
 
-    public CategoryService(
-        ICategoryRepository repository,
-        IAuthorizationService authorizationService)
-        : base(repository)
-    {
-        _repository = repository;
-        _authorizationService = authorizationService;
-    }
-
-    public override async Task<CategoryResponse> CreateAsync(
-        CategoryRequest request)
+    public override async Task<CategoryResponse> CreateAsync(CategoryRequest request)
     {
         await _authorizationService.ValidateAdminAsync();
 
-        await ValidateUniqueNameAsync(
-            request.Name,
-            null);
+        await ValidateUniqueNameAsync(request.Name, null);
 
-        var category =
-            CategoryMapper.ToEntity(request);
+        var category = CategoryMapper.ToEntity(request);
 
         await _repository.AddAsync(category);
         await _repository.SaveChangesAsync();
@@ -45,21 +34,15 @@ public class CategoryService : CrudService<
         return CategoryMapper.ToResponse(category);
     }
 
-    public override async Task<CategoryResponse> UpdateAsync(
-        long id,
-        CategoryRequest request)
+    public override async Task<CategoryResponse> UpdateAsync(long id, CategoryRequest request)
     {
         await _authorizationService.ValidateAdminAsync();
 
         var category = await GetEntityByIdAsync(id);
 
-        await ValidateUniqueNameAsync(
-            request.Name,
-            id);
+        await ValidateUniqueNameAsync(request.Name, id);
 
-        CategoryMapper.UpdateEntity(
-            category,
-            request);
+        CategoryMapper.UpdateEntity(category, request);
 
         _repository.Update(category);
 
@@ -79,26 +62,21 @@ public class CategoryService : CrudService<
         await _repository.SaveChangesAsync();
     }
 
-    public override async Task<CategoryResponse> GetByIdAsync(
-        long id)
+    public override async Task<CategoryResponse> GetByIdAsync(long id)
     {
         var category = await GetEntityByIdAsync(id);
 
         return CategoryMapper.ToResponse(category);
     }
 
-    public async Task<IEnumerable<CategoryResponse>> GetAllAsync(
-        string? name)
+    public async Task<IEnumerable<CategoryResponse>> GetAllAsync(string? name)
     {
         var categories = await FindCategoriesAsync(name);
 
-        return categories
-            .Select(CategoryMapper.ToResponse)
-            .ToList();
+        return [.. categories.Select(CategoryMapper.ToResponse)];
     }
 
-    private async Task<IEnumerable<Category>> FindCategoriesAsync(
-    string? name)
+    private async Task<IEnumerable<Category>> FindCategoriesAsync(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -108,29 +86,22 @@ public class CategoryService : CrudService<
         return await _repository.GetAllByNameContainingAsync(name);
     }
 
-    private async Task ValidateUniqueNameAsync(
-        string? name,
-        long? categoryId)
+    private async Task ValidateUniqueNameAsync(string? name, long? categoryId)
     {
         if (name is null)
         {
             return;
         }
 
-        var categoryByName =
-            await _repository.GetByNameAsync(name);
+        var categoryByName = await _repository.GetByNameAsync(name);
 
-        var categoryAlreadyExists =
-            categoryByName is not null;
+        var categoryAlreadyExists = categoryByName is not null;
 
-        var isDifferent =
-            categoryAlreadyExists &&
-            categoryByName!.Id != categoryId;
+        var isDifferent = categoryAlreadyExists && categoryByName!.Id != categoryId;
 
         if (categoryAlreadyExists && isDifferent)
         {
-            throw new BadRequestException(
-                "Category already exists");
+            throw new BadRequestException("Category already exists");
         }
     }
 }

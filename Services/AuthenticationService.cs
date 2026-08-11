@@ -1,7 +1,7 @@
 ﻿using Blog.DTOs.Authentication;
 using Blog.Entities;
 using Blog.Mappers;
-using Blog.Repositories;
+using Blog.Repositories.Interfaces;
 using Blog.Security.Interfaces;
 using Blog.Services.Interfaces;
 

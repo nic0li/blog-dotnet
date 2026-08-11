@@ -2,35 +2,26 @@
 using Blog.Entities;
 using Blog.Exceptions;
 using Blog.Mappers;
-using Blog.Repositories;
+using Blog.Repositories.Interfaces;
 using Blog.Security.Interfaces;
 using Blog.Services.Interfaces;
 
 namespace Blog.Services;
 
-public class UserService :
-    CrudService<
-        User,
-        UserResponse,
-        UserViewResponse,
-        UserCreateRequest,
-        UserUpdateRequest>,
+public class UserService(
+    IUserRepository repository,
+    IPasswordService passwordService,
+    IAuthorizationService authorizationService) : CrudService<
+    User,
+    UserResponse,
+    UserViewResponse,
+    UserCreateRequest,
+    UserUpdateRequest>(repository),
     IUserService
 {
-    private readonly IUserRepository _repository;
-    private readonly IPasswordService _passwordService;
-    private readonly IAuthorizationService _authorizationService;
-
-    public UserService(
-        IUserRepository repository,
-        IPasswordService passwordService,
-        IAuthorizationService authorizationService)
-        : base(repository)
-    {
-        _repository = repository;
-        _passwordService = passwordService;
-        _authorizationService = authorizationService;
-    }
+    private readonly IUserRepository _repository = repository;
+    private readonly IPasswordService _passwordService = passwordService;
+    private readonly IAuthorizationService _authorizationService = authorizationService;
 
     public override async Task<UserResponse> CreateAsync(UserCreateRequest request)
     {
@@ -131,13 +122,11 @@ public class UserService :
 
         var emailAlreadyExists = userByEmail is not null;
 
-        var emailBelongsToAnotherUser = emailAlreadyExists &&
-            userByEmail!.Id != userId;
+        var emailBelongsToAnotherUser = emailAlreadyExists && userByEmail!.Id != userId;
 
         if (emailAlreadyExists && emailBelongsToAnotherUser)
         {
-            throw new BadRequestException(
-                "Email already registered");
+            throw new BadRequestException("Email already registered");
         }
     }
 }

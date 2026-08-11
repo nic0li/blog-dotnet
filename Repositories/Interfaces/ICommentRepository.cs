@@ -1,9 +1,8 @@
 ﻿using Blog.Entities;
-using Blog.Repositories.Interfaces;
 
-namespace Blog.Repositories;
+namespace Blog.Repositories.Interfaces;
 
 public interface ICommentRepository : IRepository<Comment>
 {
-    Task<IEnumerable<Comment>> GetByPostIdAsync(long postId);
+    Task<IEnumerable<Comment>> GetAllByPostIdAsync(long postId);
 }

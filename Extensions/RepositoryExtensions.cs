@@ -1,4 +1,5 @@
 ﻿using Blog.Repositories;
+using Blog.Repositories.Interfaces;
 
 namespace Blog.Extensions;
 

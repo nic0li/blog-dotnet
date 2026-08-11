@@ -1,11 +1,10 @@
 ﻿using Blog.Data;
 using Blog.Entities;
 using Blog.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Repositories;
 
-public class Repository<Entity> : IRepository<Entity>
+public abstract class Repository<Entity> : IRepository<Entity>
     where Entity : BaseEntity
 {
     protected readonly AppDbContext _dbContext;
@@ -15,17 +14,9 @@ public class Repository<Entity> : IRepository<Entity>
         _dbContext = dbContext;
     }
 
-    public async Task<Entity?> GetByIdAsync(long id)
-    {
-        return await _dbContext.Set<Entity>()
-            .FirstOrDefaultAsync(entity => entity.Id == id);
-    }
+    public abstract Task<Entity?> GetByIdAsync(long id);
 
-    public async Task<IEnumerable<Entity>> GetAllAsync()
-    {
-        return await _dbContext.Set<Entity>()
-            .ToListAsync();
-    }
+    public abstract Task<IEnumerable<Entity>> GetAllAsync();
 
     public async Task AddAsync(Entity entity)
     {

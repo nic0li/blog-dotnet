@@ -1,17 +1,16 @@
 ﻿using Blog.Entities;
-using Blog.Repositories.Interfaces;
 
-namespace Blog.Repositories;
+namespace Blog.Repositories.Interfaces;
 
 public interface IPostRepository : IRepository<Post>
 {
-    Task<IEnumerable<Post>> GetByUserIdAsync(long userId);
+    Task<IEnumerable<Post>> GetAllByUserIdAsync(long userId);
 
-    Task<IEnumerable<Post>> GetByTitleContainingAsync(string title);
+    Task<IEnumerable<Post>> GetAllByTitleContainingAsync(string title);
 
-    Task<IEnumerable<Post>> GetByCategoryContainingAsync(string category);
+    Task<IEnumerable<Post>> GetAllByCategoryNameContainingAsync(string category);
 
-    Task<IEnumerable<Post>> GetByTitleContainingAndCategoryContainingAsync(
+    Task<IEnumerable<Post>> GetAllByTitleContainingAndCategoryNameContainingAsync(
         string title,
         string category);
 }
