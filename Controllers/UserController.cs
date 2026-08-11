@@ -1,4 +1,5 @@
-﻿using Blog.DTOs.User;
+﻿using Blog.DTOs.Post;
+using Blog.DTOs.User;
 using Blog.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,17 +8,31 @@ namespace Blog.Controllers;
 
 [ApiController]
 [Route("users")]
-public class UserController : ControllerBase
+[Authorize]
+public class UserController(
+    IUserService service, 
+    IPostService postService) : ControllerBase
 {
-    private readonly IUserService _service;
+    private readonly IUserService _service = service;
+    private readonly IPostService _postService = postService;
 
-    public UserController(IUserService service)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<UserViewResponse>>> GetAll()
     {
-        _service = service;
+        var response = await _service.GetAllAsync();
+
+        return Ok(response);
+    }
+
+    [HttpGet("{id:long}")]
+    public async Task<ActionResult<UserViewResponse>> GetById(long id)
+    {
+        var response = await _service.GetByIdAsync(id);
+
+        return Ok(response);
     }
 
     [HttpPut("{id:long}")]
-    [Authorize]
     public async Task<ActionResult<UserResponse>> Update(long id,UserUpdateRequest request)
     {
         var response = await _service.UpdateAsync(id, request);
@@ -26,7 +41,6 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    [Authorize]
     public async Task<IActionResult> Delete(long id)
     {
         await _service.DeleteAsync(id);
@@ -34,26 +48,7 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("{id:long}")]
-    [Authorize]
-    public async Task<ActionResult<UserViewResponse>> GetById(long id)
-    {
-        var response = await _service.GetByIdAsync(id);
-
-        return Ok(response);
-    }
-
-    [HttpGet]
-    [Authorize]
-    public async Task<ActionResult<IEnumerable<UserViewResponse>>> GetAll()
-    {
-        var response = await _service.GetAllAsync();
-
-        return Ok(response);
-    }
-
     [HttpGet("me")]
-    [Authorize]
     public async Task<ActionResult<UserResponse>> GetMe()
     {
         var response = await _service.GetMeAsync();
@@ -62,7 +57,6 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("me")]
-    [Authorize]
     public async Task<ActionResult<UserResponse>> UpdateMe(UserUpdateRequest request)
     {
         var response = await _service.UpdateMeAsync(request);
@@ -71,11 +65,30 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("me")]
-    [Authorize]
     public async Task<IActionResult> DeleteMe()
     {
         await _service.DeleteMeAsync();
 
         return NoContent();
+    }
+
+    [HttpGet("{id:long}/posts")]
+    public async Task<ActionResult<IEnumerable<PostViewResponse>>>
+    GetPostsByUser(long id)
+    {
+        var response =
+            await _postService.GetByUserAsync(id);
+
+        return Ok(response);
+    }
+
+    [HttpGet("me/posts")]
+    public async Task<ActionResult<IEnumerable<PostViewResponse>>>
+    GetMyPosts()
+    {
+        var response =
+            await _postService.GetByAuthenticatedUserAsync();
+
+        return Ok(response);
     }
 }
