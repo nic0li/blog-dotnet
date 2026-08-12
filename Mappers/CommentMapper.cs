@@ -31,8 +31,8 @@ public static class CommentMapper
             comment.Id,
             comment.Content,
             UserMapper.ToResponse(comment.User),
-            comment.CreatedAt,
-            comment.UpdatedAt);
+            DateTime.SpecifyKind(comment.CreatedAt, DateTimeKind.Utc),
+            DateTime.SpecifyKind(comment.UpdatedAt, DateTimeKind.Utc));
     }
 
     public static CommentViewResponse ToViewResponse(Comment comment)
@@ -41,8 +41,8 @@ public static class CommentMapper
             comment.Id,
             comment.Content,
             UserMapper.ToViewResponse(comment.User),
-            comment.CreatedAt,
-            comment.UpdatedAt);
+            DateTime.SpecifyKind(comment.CreatedAt, DateTimeKind.Utc),
+            DateTime.SpecifyKind(comment.UpdatedAt, DateTimeKind.Utc));
     }
 
     public static IEnumerable<CommentViewResponse> ToViewResponse(

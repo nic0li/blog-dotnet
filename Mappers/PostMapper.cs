@@ -39,8 +39,8 @@ public static class PostMapper
             post.Content,
             CategoryMapper.ToResponse(post.Category),
             UserMapper.ToResponse(post.User),
-            post.CreatedAt,
-            post.UpdatedAt);
+            DateTime.SpecifyKind(post.CreatedAt, DateTimeKind.Utc),
+            DateTime.SpecifyKind(post.UpdatedAt, DateTimeKind.Utc));
     }
 
     public static PostViewResponse ToViewResponse(Post post)
@@ -52,7 +52,7 @@ public static class PostMapper
             CategoryMapper.ToResponse(post.Category),
             UserMapper.ToViewResponse(post.User),
             CommentMapper.ToViewResponse(post.Comments),
-            post.CreatedAt,
-            post.UpdatedAt);
+            DateTime.SpecifyKind(post.CreatedAt, DateTimeKind.Utc),
+            DateTime.SpecifyKind(post.UpdatedAt, DateTimeKind.Utc));
     }
 }

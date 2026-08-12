@@ -25,11 +25,19 @@ public class JwtService : IJwtService
 
     public string GenerateToken(long userId)
     {
+        var now = DateTime.UtcNow;
+
         var claims = new[]
         {
             new Claim(
                 JwtRegisteredClaimNames.Sub,
-                userId.ToString())
+                userId.ToString()),
+            new Claim(
+                JwtRegisteredClaimNames.Iat,
+                new DateTimeOffset(now)
+                    .ToUnixTimeSeconds()
+                    .ToString(),
+                ClaimValueTypes.Integer64)
         };
 
         var key = new SymmetricSecurityKey(
@@ -41,7 +49,7 @@ public class JwtService : IJwtService
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddMilliseconds(_expiration),
+            expires: now.AddMilliseconds(_expiration),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler()

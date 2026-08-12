@@ -9,6 +9,6 @@ public record PostResponse(
     string Content,
     CategoryResponse Category,
     UserResponse User,
-    DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );

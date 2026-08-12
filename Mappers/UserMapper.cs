@@ -21,24 +21,27 @@ public static class UserMapper
         User user,
         UserUpdateRequest request)
     {
-        if (request.Email is not null)
+        if (request.EmailProvided && !string.IsNullOrWhiteSpace(request.Email))
         {
             user.Email = request.Email;
         }
 
-        if (request.Name is not null)
+        if (request.NameProvided)
         {
-            user.Name = request.Name;
+            user.Name = string.IsNullOrWhiteSpace(request.Name)
+                ? null : request.Name;
         }
 
-        if (request.Photo is not null)
+        if (request.PhotoProvided)
         {
-            user.Photo = request.Photo;
+            user.Photo = string.IsNullOrWhiteSpace(request.Photo)
+                ? null : request.Photo;
         }
 
-        if (request.Bio is not null)
+        if (request.BioProvided)
         {
-            user.Bio = request.Bio;
+            user.Bio = string.IsNullOrWhiteSpace(request.Bio)
+                ? null : request.Bio;
         }
     }
 

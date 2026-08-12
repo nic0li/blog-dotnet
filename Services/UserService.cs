@@ -44,7 +44,7 @@ public class UserService(
 
         await _authorizationService.ValidateOwnerOrAdminAsync(user);
 
-        return await UpdateUserAsync(user, request);
+        return await UpdateUserResponseAsync(user, request);
     }
 
     public override async Task DeleteAsync(long id)
@@ -81,7 +81,7 @@ public class UserService(
     {
         var user = await _authorizationService.GetAuthenticatedUserAsync();
 
-        return await UpdateUserAsync(user, request);
+        return await UpdateUserResponseAsync(user, request);
     }
 
     public async Task DeleteMeAsync()
@@ -91,7 +91,7 @@ public class UserService(
         await DeleteUserAsync(user);
     }
 
-    private async Task<UserResponse> UpdateUserAsync(User user, UserUpdateRequest request)
+    private async Task<UserResponse> UpdateUserResponseAsync(User user, UserUpdateRequest request)
     {
         await ValidateEmailAvailabilityAsync(request.Email, user.Id);
 

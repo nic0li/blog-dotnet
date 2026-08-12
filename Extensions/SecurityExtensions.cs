@@ -65,6 +65,28 @@ public static class SecurityExtensions
                         {
                             context.Fail("User not found.");
                         }
+                    },
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+
+                        context.Response.StatusCode =
+                            StatusCodes.Status401Unauthorized;
+
+                        context.Response.ContentType =
+                            "application/json";
+
+                        var response = new
+                        {
+                            timestamp = DateTime.Now
+                                .ToString("yyyy-MM-dd HH:mm:ss"),
+                            status = 401,
+                            error = "Unauthorized",
+                            message = "No message available",
+                            path = context.Request.Path.Value
+                        };
+
+                        await context.Response.WriteAsJsonAsync(response);
                     }
                 };
             });

@@ -6,6 +6,6 @@ public record CommentResponse(
     long Id,
     string Content,
     UserResponse User,
-    DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );

@@ -1,14 +1,60 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Blog.DTOs.User;
 
-public record UserUpdateRequest(
+public record UserUpdateRequest
+{
+    [JsonIgnore]
+    public bool EmailProvided { get; private set; }
+
+    [JsonIgnore]
+    public bool NameProvided { get; private set; }
+
+    [JsonIgnore]
+    public bool PhotoProvided { get; private set; }
+
+    [JsonIgnore]
+    public bool BioProvided { get; private set; }
+
     [EmailAddress(ErrorMessage = "Invalid email")]
-    string? Email,
+    public string? Email
+    {
+        get;
+        set
+        {
+            EmailProvided = true;
+            field = value;
+        }
+    }
 
-    string? Name,
+    public string? Name
+    {
+        get;
+        set
+        {
+            NameProvided = true;
+            field = value;
+        }
+    }
 
-    string? Photo,
+    public string? Photo
+    {
+        get;
+        set
+        {
+            PhotoProvided = true;
+            field = value;
+        }
+    }
 
-    string? Bio
-);
+    public string? Bio
+    {
+        get;
+        set
+        {
+            BioProvided = true;
+            field = value;
+        }
+    }
+}

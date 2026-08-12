@@ -32,7 +32,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpPut("{id:long}")]
+    [HttpPatch("{id:long}")]
     public async Task<ActionResult<UserResponse>> Update(long id,UserUpdateRequest request)
     {
         var response = await _service.UpdateAsync(id, request);
@@ -56,7 +56,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpPut("me")]
+    [HttpPatch("me")]
     public async Task<ActionResult<UserResponse>> UpdateMe(UserUpdateRequest request)
     {
         var response = await _service.UpdateMeAsync(request);

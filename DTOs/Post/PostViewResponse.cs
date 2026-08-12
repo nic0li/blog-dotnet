@@ -11,6 +11,6 @@ public record PostViewResponse(
     CategoryResponse Category,
     UserViewResponse User,
     IEnumerable<CommentViewResponse> Comments,
-    DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );
