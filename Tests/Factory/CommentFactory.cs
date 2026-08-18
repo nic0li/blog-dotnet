@@ -5,7 +5,10 @@ namespace Blog.Tests.Factory;
 
 public static class CommentFactory
 {
-    public static Comment GreatPost()
+    public static readonly DateTime MockDate =
+        new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    public static Comment Comment()
     {
         return Comment("Great post!");
     }
@@ -37,8 +40,7 @@ public static class CommentFactory
 
     public static CommentViewResponse ViewResponse()
     {
-        return new CommentViewResponse(
-            1L,
+        return new CommentViewResponse(1L,
             "Great post!",
             UserFactory.ViewResponse(),
             MockDate,
@@ -52,20 +54,18 @@ public static class CommentFactory
             Id = 1L,
             Content = content,
             User = UserFactory.User(),
-            Post = PostFactory.Post()
+            Post = PostFactory.Post(),
+            CreatedAt = MockDate,
+            UpdatedAt = MockDate
         };
     }
 
     private static CommentResponse Response(string content)
     {
-        return new CommentResponse(
-            1L,
+        return new CommentResponse(1L,
             content,
             UserFactory.Response(),
             MockDate,
             MockDate);
     }
-
-    private static readonly DateTime MockDate = 
-        new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 }

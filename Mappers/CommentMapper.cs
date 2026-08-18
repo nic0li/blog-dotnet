@@ -45,9 +45,9 @@ public static class CommentMapper
             DateTime.SpecifyKind(comment.UpdatedAt, DateTimeKind.Utc));
     }
 
-    public static IEnumerable<CommentViewResponse> ToViewResponse(
+    public static CommentViewResponse[] ToViewResponse(
         IEnumerable<Comment> comments)
     {
-        return comments.Select(ToViewResponse);
+        return [.. comments.Select(ToViewResponse)];
     }
 }

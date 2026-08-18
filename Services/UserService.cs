@@ -93,7 +93,11 @@ public class UserService(
 
     private async Task<UserResponse> UpdateUserResponseAsync(User user, UserUpdateRequest request)
     {
-        await ValidateEmailAvailabilityAsync(request.Email, user.Id);
+        if (request.EmailProvided
+            && !string.IsNullOrEmpty(request.Email))
+        {
+            await ValidateEmailAvailabilityAsync(request.Email, user.Id);
+        }
 
         UserMapper.UpdateEntity(user, request);
 
@@ -111,13 +115,8 @@ public class UserService(
         await _repository.SaveChangesAsync();
     }
 
-    private async Task ValidateEmailAvailabilityAsync(string? email, long? userId)
+    private async Task ValidateEmailAvailabilityAsync(string email, long? userId)
     {
-        if (email is null)
-        {
-            return;
-        }
-
         var userByEmail = await _repository.GetByEmailAsync(email);
 
         var emailAlreadyExists = userByEmail is not null;

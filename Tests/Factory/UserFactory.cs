@@ -9,25 +9,19 @@ public static class UserFactory
     public static User User()
     {
         return User(1L,
-            "maria@email.com",
-            "Maria",
-            UserRole.User);
+            "maria@email.com", "Maria", UserRole.User);
     }
 
     public static User Admin()
     {
         return User(2L,
-            "ana@email.com",
-            "Ana",
-            UserRole.Admin);
+            "ana@email.com", "Ana", UserRole.Admin);
     }
 
     public static UserCreateRequest CreateRequest()
     {
         return new UserCreateRequest(
-            "maria@email.com",
-            "123456",
-            "Maria");
+            "maria@email.com", "123456", "Maria");
     }
 
     public static UserUpdateRequest UpdateRequest()
@@ -57,41 +51,26 @@ public static class UserFactory
 
     public static UserResponse Response()
     {
-        return UserResponse(
-            "maria@email.com",
-            "Maria",
-            null);
+        return UserResponse("maria@email.com", "Maria", null);
     }
 
     public static UserResponse UpdatedResponse()
     {
-        return UserResponse(
-            "mariasilva@email.com",
-            "Maria Silva",
-            "dev");
+        return UserResponse("mariasilva@email.com", "Maria Silva", "dev");
     }
 
     public static UserResponse UpdatedResponseSameEmail()
     {
-        return UserResponse(
-            "maria@email.com",
-            "Maria Silva",
-            "dev");
+        return UserResponse("maria@email.com", "Maria Silva", "dev");
     }
 
     public static UserViewResponse ViewResponse()
     {
-        return new UserViewResponse(1L,
-            "Maria",
-            null,
-            null);
+        return new UserViewResponse(1L, "Maria", null, null);
     }
 
     private static User User(
-        long id,
-        string email,
-        string name,
-        UserRole role)
+        long id, string email, string name, UserRole role)
     {
         return new User
         {
@@ -121,17 +100,8 @@ public static class UserFactory
     }
 
     private static UserResponse UserResponse(
-        string email,
-        string? name,
-        string? bio)
+        string email, string? name, string? bio)
     {
-        return new UserResponse(
-            1L,
-            email,
-            name,
-            null,
-            bio,
-            UserRole.User
-        );
+        return new UserResponse(1L, email, name, null, bio, UserRole.User);
     }
 }
