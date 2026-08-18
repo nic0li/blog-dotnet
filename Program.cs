@@ -35,6 +35,8 @@ public class Program
 
         builder.Services.AddExceptionHandling();
 
+        builder.Services.AddCorsPolicy();
+
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -43,6 +45,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseCors("CorsPolicy");
 
         app.UseExceptionHandling();
 

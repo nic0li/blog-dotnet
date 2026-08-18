@@ -1,0 +1,71 @@
+﻿using Blog.DTOs.Comment;
+using Blog.Entities;
+
+namespace Blog.Tests.Factory;
+
+public static class CommentFactory
+{
+    public static Comment GreatPost()
+    {
+        return Comment("Great post!");
+    }
+
+    public static Comment UpdatedComment()
+    {
+        return Comment("Updated comment!");
+    }
+
+    public static CommentCreateRequest CreateRequest()
+    {
+        return new CommentCreateRequest("Great post!", 1L);
+    }
+
+    public static CommentUpdateRequest UpdateRequest()
+    {
+        return new CommentUpdateRequest("Updated comment!");
+    }
+
+    public static CommentResponse Response()
+    {
+        return Response("Great post!");
+    }
+
+    public static CommentResponse UpdatedResponse()
+    {
+        return Response("Updated comment!");
+    }
+
+    public static CommentViewResponse ViewResponse()
+    {
+        return new CommentViewResponse(
+            1L,
+            "Great post!",
+            UserFactory.ViewResponse(),
+            MockDate,
+            MockDate);
+    }
+
+    private static Comment Comment(string content)
+    {
+        return new Comment
+        {
+            Id = 1L,
+            Content = content,
+            User = UserFactory.User(),
+            Post = PostFactory.Post()
+        };
+    }
+
+    private static CommentResponse Response(string content)
+    {
+        return new CommentResponse(
+            1L,
+            content,
+            UserFactory.Response(),
+            MockDate,
+            MockDate);
+    }
+
+    private static readonly DateTime MockDate = 
+        new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+}

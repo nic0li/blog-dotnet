@@ -5,18 +5,6 @@ namespace Blog.DTOs.User;
 
 public record UserUpdateRequest
 {
-    [JsonIgnore]
-    public bool EmailProvided { get; private set; }
-
-    [JsonIgnore]
-    public bool NameProvided { get; private set; }
-
-    [JsonIgnore]
-    public bool PhotoProvided { get; private set; }
-
-    [JsonIgnore]
-    public bool BioProvided { get; private set; }
-
     [EmailAddress(ErrorMessage = "Invalid email")]
     public string? Email
     {
@@ -57,4 +45,17 @@ public record UserUpdateRequest
             field = value;
         }
     }
+
+    [JsonIgnore]
+    public bool EmailProvided { get; private set; }
+
+    [JsonIgnore]
+    public bool NameProvided { get; private set; }
+
+    [JsonIgnore]
+    public bool PhotoProvided { get; private set; }
+
+    [JsonIgnore]
+    public bool BioProvided { get; private set; }
+
 }
