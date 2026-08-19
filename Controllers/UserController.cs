@@ -33,7 +33,7 @@ public class UserController(
     }
 
     [HttpPatch("{id:long}")]
-    public async Task<ActionResult<UserResponse>> Update(long id,UserUpdateRequest request)
+    public async Task<ActionResult<UserResponse>> Update(long id, UserUpdateRequest request)
     {
         var response = await _service.UpdateAsync(id, request);
 
@@ -72,12 +72,27 @@ public class UserController(
         return NoContent();
     }
 
+    [HttpPatch("me/password")]
+    public async Task<IActionResult> UpdatePassword(UserPasswordUpdateRequest request)
+    {
+        await _service.UpdatePasswordAsync(request);
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/role")]
+    public async Task<ActionResult<UserResponse>> ToggleRole(long id)
+    {
+        var response = await _service.ToggleRoleAsync(id);
+
+        return Ok(response);
+    }
+
     [HttpGet("{id:long}/posts")]
     public async Task<ActionResult<IEnumerable<PostViewResponse>>>
     GetPostsByUser(long id)
     {
-        var response =
-            await _postService.GetByUserAsync(id);
+        var response = await _postService.GetByUserAsync(id);
 
         return Ok(response);
     }
@@ -86,8 +101,7 @@ public class UserController(
     public async Task<ActionResult<IEnumerable<PostViewResponse>>>
     GetMyPosts()
     {
-        var response =
-            await _postService.GetByAuthenticatedUserAsync();
+        var response = await _postService.GetByAuthenticatedUserAsync();
 
         return Ok(response);
     }

@@ -2,7 +2,7 @@
 
 namespace Blog.DTOs.Authentication;
 
-public record LoginResponse(
+public record AuthenticationResponse(
     UserResponse User,
     string Token
 );

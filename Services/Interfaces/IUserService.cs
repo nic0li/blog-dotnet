@@ -15,4 +15,8 @@ public interface IUserService : ICrudService<
     Task<UserResponse> UpdateMeAsync(UserUpdateRequest request);
 
     Task DeleteMeAsync();
+
+    Task UpdatePasswordAsync(UserPasswordUpdateRequest request);
+
+    Task<UserResponse> ToggleRoleAsync(long id);
 }

@@ -5,7 +5,7 @@ namespace Blog.Services.Interfaces;
 
 public interface IAuthenticationService
 {
-    Task<LoginResponse> AuthenticateAsync(LoginRequest request);
+    Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request);
 
     Task<User> GetAuthenticatedUserAsync();
 }

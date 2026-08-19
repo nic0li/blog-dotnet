@@ -18,7 +18,7 @@ public class AuthenticationController(
 
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+    public async Task<ActionResult<AuthenticationResponse>> Login(AuthenticationRequest request)
     {
         var response = await _authenticationService.AuthenticateAsync(request);
 

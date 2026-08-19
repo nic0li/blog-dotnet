@@ -1,6 +1,6 @@
 ﻿namespace Blog.DTOs.Authentication;
 
-public record LoginRequest(
+public record AuthenticationRequest(
     string Login,
     string Password
 );

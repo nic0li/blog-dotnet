@@ -34,7 +34,7 @@ public class AuthenticationServiceTests
     public async Task AuthenticateAsync_ShouldAuthenticateSuccessfully()
     {
         // Arrange
-        var request = new LoginRequest("maria@email.com", "123456");
+        var request = new AuthenticationRequest("maria@email.com", "123456");
         var user = UserFactory.User();
 
         _repository.Setup(repository =>
@@ -71,7 +71,7 @@ public class AuthenticationServiceTests
     public async Task AuthenticateAsync_ShouldThrowWhenCredentialsAreInvalid()
     {
         // Arrange
-        var request = new LoginRequest("maria@email.com", "123456");
+        var request = new AuthenticationRequest("maria@email.com", "123456");
         var user = UserFactory.User();
 
         _repository.Setup(repository =>
@@ -100,7 +100,7 @@ public class AuthenticationServiceTests
     public async Task AuthenticateAsync_ShouldThrowWhenUserDoesNotExist()
     {
         // Arrange
-        var request = new LoginRequest("maria@email.com", "123456");
+        var request = new AuthenticationRequest("maria@email.com", "123456");
 
         _repository.Setup(repository =>
                 repository.GetByEmailAsync("maria@email.com"))

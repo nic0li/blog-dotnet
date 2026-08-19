@@ -91,6 +91,48 @@ public class UserService(
         await DeleteUserAsync(user);
     }
 
+    public async Task UpdatePasswordAsync(UserPasswordUpdateRequest request)
+    {
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
+
+        var passwordIsValid = _passwordService.Verify(request.CurrentPassword, user.Password);
+
+        if (!passwordIsValid)
+        {
+            throw new UnauthorizedAccessException("Invalid current password");
+        }
+
+        user.Password = _passwordService.Hash(request.NewPassword);
+
+        _repository.Update(user);
+
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task<UserResponse> ToggleRoleAsync(long id)
+    {
+        await _authorizationService.ValidateAdminAsync();
+
+        var authenticatedUser = await _authorizationService.GetAuthenticatedUserAsync();
+
+        var user = await GetEntityByIdAsync(id);
+
+        if (authenticatedUser.Id == user.Id)
+        {
+            throw new BadRequestException("You cannot change your own role");
+        }
+
+        user.Role = user.Role == Enums.UserRole.Admin
+            ? Enums.UserRole.User
+            : Enums.UserRole.Admin;
+
+        _repository.Update(user);
+
+        await _repository.SaveChangesAsync();
+
+        return UserMapper.ToResponse(user);
+    }
+
     private async Task<UserResponse> UpdateUserResponseAsync(User user, UserUpdateRequest request)
     {
         if (request.EmailProvided

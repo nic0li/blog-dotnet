@@ -26,8 +26,8 @@ public class AuthenticationService : IAuthenticationService
         _currentUserService = currentUserService;
     }
 
-    public async Task<LoginResponse> AuthenticateAsync(
-        LoginRequest request)
+    public async Task<AuthenticationResponse> AuthenticateAsync(
+        AuthenticationRequest request)
     {
         var user = await _repository.GetByEmailAsync(request.Login);
 
@@ -42,7 +42,7 @@ public class AuthenticationService : IAuthenticationService
 
         var token = _jwtService.GenerateToken(user.Id);
 
-        return new LoginResponse(
+        return new AuthenticationResponse(
             UserMapper.ToResponse(user),
             token);
     }
