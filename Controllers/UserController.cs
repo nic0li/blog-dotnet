@@ -32,14 +32,6 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpPatch("{id:long}")]
-    public async Task<ActionResult<UserResponse>> Update(long id, UserUpdateRequest request)
-    {
-        var response = await _service.UpdateAsync(id, request);
-
-        return Ok(response);
-    }
-
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
     {

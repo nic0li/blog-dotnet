@@ -35,7 +35,7 @@ public class CommentService(
         return CommentMapper.ToResponse(comment);
     }
 
-    public override async Task<CommentResponse> UpdateAsync(long id, CommentUpdateRequest request)
+    public async Task<CommentResponse> UpdateAsync(long id, CommentUpdateRequest request)
     {
         var comment = await GetEntityByIdAsync(id);
 

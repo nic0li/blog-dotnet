@@ -34,7 +34,7 @@ public class CategoryService(
         return CategoryMapper.ToResponse(category);
     }
 
-    public override async Task<CategoryResponse> UpdateAsync(long id, CategoryRequest request)
+    public async Task<CategoryResponse> UpdateAsync(long id, CategoryRequest request)
     {
         await _authorizationService.ValidateAdminAsync();
 

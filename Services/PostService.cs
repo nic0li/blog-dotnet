@@ -36,7 +36,7 @@ public class PostService(
         return PostMapper.ToResponse(post);
     }
 
-    public override async Task<PostResponse> UpdateAsync(long id, PostUpdateRequest request)
+    public async Task<PostResponse> UpdateAsync(long id, PostUpdateRequest request)
     {
         var post = await GetEntityByIdAsync(id);
 

@@ -20,7 +20,7 @@ public class Program
             });
 
         builder.Services.AddOpenApi();
-        builder.Services.AddSwaggerConfiguration();
+        builder.Services.AddOpenApiConfiguration();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(

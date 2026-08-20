@@ -101,40 +101,32 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_ShouldUpdateUserSuccessfully()
+    public async Task UpdateMeAsync_ShouldUpdateAuthenticatedUserSuccessfully()
     {
         // Arrange
         var request = UserFactory.UpdateRequest();
         var user = UserFactory.User();
 
-        _repository.Setup(repository =>
-                repository.GetByIdAsync(1L))
-            .ReturnsAsync(user);
-
         _authorizationService.Setup(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user))
-            .Returns(Task.CompletedTask);
+                authorizationService.GetAuthenticatedUserAsync())
+            .ReturnsAsync(user);
 
         _repository.Setup(repository =>
                 repository.GetByEmailAsync("mariasilva@email.com"))
             .ReturnsAsync((User?)null);
 
         // Act
-        var response = await _service.UpdateAsync(1L, request);
+        var response = await _service.UpdateMeAsync(request);
 
         // Assert
         var expected = UserFactory.UpdatedResponse();
         Assert.Equal(expected, response);
 
-        _repository.Verify(repository =>
-                repository.GetByIdAsync(1L), Times.Once);
-
         _authorizationService.Verify(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user), Times.Once);
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
 
         _repository.Verify(repository =>
-                repository.GetByEmailAsync(
-                    "mariasilva@email.com"), Times.Once);
+                repository.GetByEmailAsync("mariasilva@email.com"), Times.Once);
 
         _repository.Verify(repository =>
                 repository.Update(user), Times.Once);
@@ -144,35 +136,25 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_ShouldUpdateUserWithNullEmail()
+    public async Task UpdateMeAsync_ShouldUpdateAuthenticatedUserWithNullEmail()
     {
         // Arrange
         var request = UserFactory.UpdateRequestNullEmail();
         var user = UserFactory.User();
 
-        _repository.Setup(repository =>
-                repository.GetByIdAsync(1L))
+        _authorizationService.Setup(authorizationService =>
+                authorizationService.GetAuthenticatedUserAsync())
             .ReturnsAsync(user);
 
-        _authorizationService.Setup(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user))
-            .Returns(Task.CompletedTask);
-
         // Act
-        var response = await _service.UpdateAsync(1L, request);
+        var response = await _service.UpdateMeAsync(request);
 
         // Assert
         var expected = UserFactory.UpdatedResponseSameEmail();
         Assert.Equal(expected, response);
 
-        _repository.Verify(repository =>
-                repository.GetByIdAsync(1L), Times.Once);
-
         _authorizationService.Verify(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user), Times.Once);
-
-        _repository.Verify(repository =>
-                repository.GetByEmailAsync(It.IsAny<string>()), Times.Never);
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
 
         _repository.Verify(repository =>
                 repository.Update(user), Times.Once);
@@ -182,36 +164,29 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_ShouldUpdateUserWithSameEmail()
+    public async Task UpdateMeAsync_ShouldUpdateAuthenticatedUserWithSameEmail()
     {
         // Arrange
         var request = UserFactory.UpdateRequestSameEmail();
         var user = UserFactory.User();
 
-        _repository.Setup(repository =>
-                repository.GetByIdAsync(1L))
-            .ReturnsAsync(user);
-
         _authorizationService.Setup(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user))
-            .Returns(Task.CompletedTask);
+                authorizationService.GetAuthenticatedUserAsync())
+            .ReturnsAsync(user);
 
         _repository.Setup(repository =>
                 repository.GetByEmailAsync("maria@email.com"))
             .ReturnsAsync(user);
 
         // Act
-        var response = await _service.UpdateAsync(1L, request);
+        var response = await _service.UpdateMeAsync(request);
 
         // Assert
         var expected = UserFactory.UpdatedResponseSameEmail();
         Assert.Equal(expected, response);
 
-        _repository.Verify(repository =>
-                repository.GetByIdAsync(1L), Times.Once);
-
         _authorizationService.Verify(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user), Times.Once);
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
 
         _repository.Verify(repository =>
                 repository.GetByEmailAsync("maria@email.com"), Times.Once);
@@ -224,32 +199,25 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_ShouldUpdateUserWithEmailEmpty()
+    public async Task UpdateMeAsync_ShouldUpdateAuthenticatedUserWithEmailEmpty()
     {
         // Arrange
         var request = UserFactory.UpdateRequestEmptyEmail();
         var user = UserFactory.User();
 
-        _repository.Setup(repository =>
-                repository.GetByIdAsync(1L))
+        _authorizationService.Setup(authorizationService =>
+                authorizationService.GetAuthenticatedUserAsync())
             .ReturnsAsync(user);
 
-        _authorizationService.Setup(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user))
-            .Returns(Task.CompletedTask);
-
         // Act
-        var response = await _service.UpdateAsync(1L, request);
+        var response = await _service.UpdateMeAsync(request);
 
         // Assert
         var expected = UserFactory.UpdatedResponseSameEmail();
         Assert.Equal(expected, response);
 
-        _repository.Verify(repository =>
-                repository.GetByIdAsync(1L), Times.Once);
-
         _authorizationService.Verify(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user), Times.Once);
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
 
         _repository.Verify(repository =>
                 repository.GetByEmailAsync(It.IsAny<string>()), Times.Never);
@@ -262,32 +230,25 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_ShouldUpdateUserWithoutEmailField()
+    public async Task UpdateMeAsync_ShouldUpdateAuthenticatedUserWithoutEmailField()
     {
         // Arrange
         var request = UserFactory.UpdateRequestWithoutEmail();
         var user = UserFactory.User();
 
-        _repository.Setup(repository =>
-                repository.GetByIdAsync(1L))
+        _authorizationService.Setup(authorizationService =>
+                authorizationService.GetAuthenticatedUserAsync())
             .ReturnsAsync(user);
 
-        _authorizationService.Setup(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user))
-            .Returns(Task.CompletedTask);
-
         // Act
-        var response = await _service.UpdateAsync(1L, request);
+        var response = await _service.UpdateMeAsync(request);
 
         // Assert
         var expected = UserFactory.UpdatedResponseSameEmail();
         Assert.Equal(expected, response);
 
-        _repository.Verify(repository =>
-                repository.GetByIdAsync(1L), Times.Once);
-
         _authorizationService.Verify(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user), Times.Once);
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
 
         _repository.Verify(repository =>
                 repository.GetByEmailAsync(It.IsAny<string>()), Times.Never);
@@ -300,20 +261,16 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_ShouldThrowWhenEmailAlreadyBelongsToAnotherUser()
+    public async Task UpdateMeAsync_ShouldThrowWhenEmailAlreadyBelongsToAnotherUser()
     {
         // Arrange
         var request = UserFactory.UpdateRequest();
         var user = UserFactory.User();
         var admin = UserFactory.Admin();
 
-        _repository.Setup(repository =>
-                repository.GetByIdAsync(1L))
-            .ReturnsAsync(user);
-
         _authorizationService.Setup(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user))
-            .Returns(Task.CompletedTask);
+                authorizationService.GetAuthenticatedUserAsync())
+            .ReturnsAsync(user);
 
         _repository.Setup(repository =>
                 repository.GetByEmailAsync("mariasilva@email.com"))
@@ -321,16 +278,13 @@ public class UserServiceTests
 
         // Act / Assert
         await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.UpdateAsync(1L, request));
-
-        _repository.Verify(repository =>
-                repository.GetByIdAsync(1L), Times.Once);
+            () => _service.UpdateMeAsync(request));
 
         _authorizationService.Verify(authorizationService =>
-                authorizationService.ValidateOwnerOrAdminAsync(user), Times.Once);
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
 
         _repository.Verify(repository =>
-        repository.GetByEmailAsync("mariasilva@email.com"), Times.Once);
+                repository.GetByEmailAsync("mariasilva@email.com"), Times.Once);
 
         _repository.Verify(repository =>
                 repository.Update(It.IsAny<User>()), Times.Never);
@@ -436,74 +390,6 @@ public class UserServiceTests
 
         _authorizationService.Verify(authorizationService =>
                 authorizationService.GetAuthenticatedUserAsync(), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateMeAsync_ShouldUpdateAuthenticatedUserSuccessfully()
-    {
-        // Arrange
-        var request = UserFactory.UpdateRequest();
-        var user = UserFactory.User();
-
-        _authorizationService.Setup(authorizationService =>
-                authorizationService.GetAuthenticatedUserAsync())
-            .ReturnsAsync(user);
-
-        _repository.Setup(repository =>
-                repository.GetByEmailAsync("mariasilva@email.com"))
-            .ReturnsAsync((User?)null);
-
-        // Act
-        var response = await _service.UpdateMeAsync(request);
-
-        // Assert
-        var expected = UserFactory.UpdatedResponse();
-        Assert.Equal(expected, response);
-
-        _authorizationService.Verify(authorizationService =>
-                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
-
-        _repository.Verify(repository =>
-                repository.GetByEmailAsync("mariasilva@email.com"), Times.Once);
-
-        _repository.Verify(repository =>
-                repository.Update(user), Times.Once);
-
-        _repository.Verify(repository =>
-                repository.SaveChangesAsync(), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateMeAsync_ShouldThrowWhenEmailAlreadyBelongsToAnotherUser()
-    {
-        // Arrange
-        var request = UserFactory.UpdateRequest();
-        var user = UserFactory.User();
-        var admin = UserFactory.Admin();
-
-        _authorizationService.Setup(authorizationService =>
-                authorizationService.GetAuthenticatedUserAsync())
-            .ReturnsAsync(user);
-
-        _repository.Setup(repository =>
-                repository.GetByEmailAsync("mariasilva@email.com"))
-            .ReturnsAsync(admin);
-
-        // Act / Assert
-        await Assert.ThrowsAsync<BadRequestException>(
-            () => _service.UpdateMeAsync(request));
-
-        _authorizationService.Verify(authorizationService =>
-                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
-
-        _repository.Verify(repository =>
-                repository.GetByEmailAsync("mariasilva@email.com"), Times.Once);
-
-        _repository.Verify(repository =>
-                repository.Update(It.IsAny<User>()), Times.Never);
-
-        _repository.Verify(repository =>
-                repository.SaveChangesAsync(), Times.Never);
     }
 
     [Fact]

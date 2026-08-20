@@ -6,9 +6,10 @@ namespace Blog.Services.Interfaces;
 public interface IPostService : ICrudService<
     PostResponse,
     PostViewResponse,
-    PostCreateRequest,
-    PostUpdateRequest>
+    PostCreateRequest>
 {
+    Task<PostResponse> UpdateAsync(long id, PostUpdateRequest request);
+
     Task<Post> GetEntityByIdAsync(long id);
 
     Task<IEnumerable<PostViewResponse>> GetAllAsync(PostFiltersRequest request);

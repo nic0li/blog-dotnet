@@ -38,15 +38,6 @@ public class UserService(
         return UserMapper.ToResponse(user);
     }
 
-    public override async Task<UserResponse> UpdateAsync(long id, UserUpdateRequest request)
-    {
-        var user = await GetEntityByIdAsync(id);
-
-        await _authorizationService.ValidateOwnerOrAdminAsync(user);
-
-        return await UpdateUserResponseAsync(user, request);
-    }
-
     public override async Task DeleteAsync(long id)
     {
         var user = await GetEntityByIdAsync(id);

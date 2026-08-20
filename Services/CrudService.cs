@@ -12,8 +12,7 @@ public abstract class CrudService<
     : ICrudService<
         Response,
         ViewResponse,
-        CreateRequest,
-        UpdateRequest>
+        CreateRequest>
     where Entity : BaseEntity
 {
     protected readonly IRepository<Entity> Repository;
@@ -37,8 +36,6 @@ public abstract class CrudService<
     }
 
     public abstract Task<Response> CreateAsync(CreateRequest request);
-
-    public abstract Task<Response> UpdateAsync(long id, UpdateRequest request);
 
     public abstract Task DeleteAsync(long id);
 
