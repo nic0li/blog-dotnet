@@ -1,4 +1,5 @@
-﻿using Blog.DTOs.Post;
+﻿using Blog.DTOs.Comment;
+using Blog.DTOs.Post;
 using Blog.Entities;
 
 namespace Blog.Tests.Factory;
@@ -30,24 +31,17 @@ public static class PostFactory
 
     public static PostResponse Response()
     {
-        return Response("I like drama", "Content");
+        return Response("I like drama", "Content", []);
     }
 
     public static PostResponse UpdatedResponse()
     {
-        return Response("I love drama", "Updated content");
+        return Response("I love drama", "Updated content", []);
     }
 
-    public static PostViewResponse ViewResponse()
+    public static PostResponse ResponseWithoutComments()
     {
-        return new PostViewResponse(1L,
-            "I like drama",
-            "Content",
-            CategoryFactory.Response(),
-            UserFactory.ViewResponse(),
-            [],
-            MockDate,
-            MockDate);
+        return Response("I like drama", "Content", null);
     }
 
     private static Post Post(string title, string content)
@@ -57,22 +51,23 @@ public static class PostFactory
             Id = 1L,
             Title = title,
             Content = content,
+            CreatedAt = MockDate,
+            UpdatedAt = MockDate,
             Category = CategoryFactory.Movies(),
             User = UserFactory.User(),
-            Comments = [],
-            CreatedAt = MockDate,
-            UpdatedAt = MockDate
+            Comments = []
         };
     }
 
-    private static PostResponse Response(string title, string content)
+    private static PostResponse Response(string title, string content, List<CommentResponse>? comments)
     {
         return new PostResponse(1L,
             title,
             content,
-            CategoryFactory.Response(),
-            UserFactory.Response(),
             MockDate,
-            MockDate);
+            MockDate,
+            CategoryFactory.Response(),
+            UserFactory.ProfileResponse(),
+            comments);
     }
 }

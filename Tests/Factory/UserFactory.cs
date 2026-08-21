@@ -64,9 +64,9 @@ public static class UserFactory
         return UserResponse("maria@email.com", "Maria Silva", "dev");
     }
 
-    public static UserViewResponse ViewResponse()
+    public static UserProfileResponse ProfileResponse()
     {
-        return new UserViewResponse(1L, "Maria", null, null);
+        return new UserProfileResponse(1L, "Maria", null, null);
     }
 
     private static User User(

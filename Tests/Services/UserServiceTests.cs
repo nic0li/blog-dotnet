@@ -348,7 +348,7 @@ public class UserServiceTests
         var response = await _service.GetByIdAsync(1L);
 
         // Assert
-        var expected = UserFactory.ViewResponse();
+        var expected = UserFactory.ProfileResponse();
         Assert.Equal(expected, response);
 
         _repository.Verify(repository =>

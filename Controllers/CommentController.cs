@@ -13,7 +13,7 @@ public class CommentController(ICommentService service) : ControllerBase
     private readonly ICommentService _service = service;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CommentViewResponse>>> GetAll()
+    public async Task<ActionResult<IEnumerable<CommentResponse>>> GetAll()
     {
         var response = await _service.GetAllAsync();
 
@@ -21,7 +21,7 @@ public class CommentController(ICommentService service) : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<CommentViewResponse>> GetById(long id)
+    public async Task<ActionResult<CommentResponse>> GetById(long id)
     {
         var response = await _service.GetByIdAsync(id);
 

@@ -1,4 +1,5 @@
-﻿using Blog.DTOs.Post;
+﻿using Blog.DTOs.Comment;
+using Blog.DTOs.Post;
 using Blog.Entities;
 
 namespace Blog.Mappers;
@@ -33,26 +34,27 @@ public static class PostMapper
 
     public static PostResponse ToResponse(Post post)
     {
+        return ToResponse(
+            post,
+            [.. CommentMapper.ToListResponseWithoutPost(post.Comments)]);
+    }
+
+    public static PostResponse ToResponseWithoutComments(Post post)
+    {
+        return ToResponse(post, null);
+    }
+
+    private static PostResponse ToResponse(Post post,
+        List<CommentResponse>? comments)
+    {
         return new PostResponse(
             post.Id,
             post.Title,
             post.Content,
-            CategoryMapper.ToResponse(post.Category),
-            UserMapper.ToResponse(post.User),
             DateTime.SpecifyKind(post.CreatedAt, DateTimeKind.Utc),
-            DateTime.SpecifyKind(post.UpdatedAt, DateTimeKind.Utc));
-    }
-
-    public static PostViewResponse ToViewResponse(Post post)
-    {
-        return new PostViewResponse(
-            post.Id,
-            post.Title,
-            post.Content,
+            DateTime.SpecifyKind(post.UpdatedAt, DateTimeKind.Utc),
             CategoryMapper.ToResponse(post.Category),
-            UserMapper.ToViewResponse(post.User),
-            CommentMapper.ToViewResponse(post.Comments),
-            DateTime.SpecifyKind(post.CreatedAt, DateTimeKind.Utc),
-            DateTime.SpecifyKind(post.UpdatedAt, DateTimeKind.Utc));
+            UserMapper.ToProfileResponse(post.User),
+            comments);
     }
 }

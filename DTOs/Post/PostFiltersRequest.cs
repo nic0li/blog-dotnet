@@ -10,12 +10,8 @@ public record PostFiltersRequest(
     [BindNever]
     public bool HasTitle =>
         !string.IsNullOrWhiteSpace(Title);
-
+    
     [BindNever]
-    public bool HasCategory =>
+    public bool HasCategory => 
         !string.IsNullOrWhiteSpace(Category);
-
-    [BindNever]
-    public bool IsEmpty =>
-        !HasTitle && !HasCategory;
 }

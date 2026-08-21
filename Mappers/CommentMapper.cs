@@ -27,27 +27,31 @@ public static class CommentMapper
 
     public static CommentResponse ToResponse(Comment comment)
     {
+        return ToResponse(comment, true);
+    }
+
+    public static CommentResponse ToResponseWithoutPost(Comment comment)
+    {
+        return ToResponse(comment, false);
+    }
+
+    public static List<CommentResponse> ToListResponseWithoutPost(
+        IEnumerable<Comment> comments)
+    {
+        return [.. comments.Select(ToResponseWithoutPost)];
+    }
+
+    private static CommentResponse ToResponse(Comment comment,
+        bool includePost)
+    {
         return new CommentResponse(
             comment.Id,
             comment.Content,
-            UserMapper.ToResponse(comment.User),
             DateTime.SpecifyKind(comment.CreatedAt, DateTimeKind.Utc),
-            DateTime.SpecifyKind(comment.UpdatedAt, DateTimeKind.Utc));
-    }
-
-    public static CommentViewResponse ToViewResponse(Comment comment)
-    {
-        return new CommentViewResponse(
-            comment.Id,
-            comment.Content,
-            UserMapper.ToViewResponse(comment.User),
-            DateTime.SpecifyKind(comment.CreatedAt, DateTimeKind.Utc),
-            DateTime.SpecifyKind(comment.UpdatedAt, DateTimeKind.Utc));
-    }
-
-    public static CommentViewResponse[] ToViewResponse(
-        IEnumerable<Comment> comments)
-    {
-        return [.. comments.Select(ToViewResponse)];
+            DateTime.SpecifyKind(comment.UpdatedAt, DateTimeKind.Utc),
+            UserMapper.ToProfileResponse(comment.User),
+            includePost
+                ? PostMapper.ToResponseWithoutComments(comment.Post)
+                : null);
     }
 }

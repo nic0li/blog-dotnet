@@ -12,7 +12,7 @@ public class CommentService(
     IPostService postService) : CrudService<
     Comment,
     CommentResponse,
-    CommentViewResponse,
+    CommentResponse,
     CommentCreateRequest,
     CommentUpdateRequest>(repository),
     ICommentService
@@ -61,17 +61,17 @@ public class CommentService(
         await _repository.SaveChangesAsync();
     }
 
-    public override async Task<CommentViewResponse> GetByIdAsync(long id)
+    public override async Task<CommentResponse> GetByIdAsync(long id)
     {
         var comment = await GetEntityByIdAsync(id);
 
-        return CommentMapper.ToViewResponse(comment);
+        return CommentMapper.ToResponse(comment);
     }
 
-    public async Task<IEnumerable<CommentViewResponse>> GetAllAsync()
+    public async Task<IEnumerable<CommentResponse>> GetAllAsync()
     {
         var comments = await _repository.GetAllAsync();
 
-        return [.. comments.Select(CommentMapper.ToViewResponse)];
+        return [.. comments.Select(CommentMapper.ToResponse)];
     }
 }

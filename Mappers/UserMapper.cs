@@ -56,9 +56,9 @@ public static class UserMapper
             user.Role);
     }
 
-    public static UserViewResponse ToViewResponse(User user)
+    public static UserProfileResponse ToProfileResponse(User user)
     {
-        return new UserViewResponse(
+        return new UserProfileResponse(
             user.Id,
             user.Name,
             user.Photo,

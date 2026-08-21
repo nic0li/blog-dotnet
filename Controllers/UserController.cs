@@ -17,7 +17,7 @@ public class UserController(
     private readonly IPostService _postService = postService;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserViewResponse>>> GetAll()
+    public async Task<ActionResult<IEnumerable<UserProfileResponse>>> GetAll()
     {
         var response = await _service.GetAllAsync();
 
@@ -25,7 +25,7 @@ public class UserController(
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<UserViewResponse>> GetById(long id)
+    public async Task<ActionResult<UserProfileResponse>> GetById(long id)
     {
         var response = await _service.GetByIdAsync(id);
 
@@ -81,7 +81,7 @@ public class UserController(
     }
 
     [HttpGet("{id:long}/posts")]
-    public async Task<ActionResult<IEnumerable<PostViewResponse>>>
+    public async Task<ActionResult<IEnumerable<PostResponse>>>
     GetPostsByUser(long id)
     {
         var response = await _postService.GetByUserAsync(id);
@@ -90,7 +90,7 @@ public class UserController(
     }
 
     [HttpGet("me/posts")]
-    public async Task<ActionResult<IEnumerable<PostViewResponse>>>
+    public async Task<ActionResult<IEnumerable<PostResponse>>>
     GetMyPosts()
     {
         var response = await _postService.GetByAuthenticatedUserAsync();

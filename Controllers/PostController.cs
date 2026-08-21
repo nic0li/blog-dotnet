@@ -13,7 +13,7 @@ public class PostController(IPostService service) : ControllerBase
     private readonly IPostService _service = service;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PostViewResponse>>> GetAll([FromQuery] PostFiltersRequest filters)
+    public async Task<ActionResult<IEnumerable<PostResponse>>> GetAll([FromQuery] PostFiltersRequest filters)
     {
         var response = await _service.GetAllAsync(filters);
 
@@ -21,7 +21,7 @@ public class PostController(IPostService service) : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<PostViewResponse>> GetById(long id)
+    public async Task<ActionResult<PostResponse>> GetById(long id)
     {
         var response = await _service.GetByIdAsync(id);
 

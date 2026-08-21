@@ -58,7 +58,7 @@ public class PostServiceTests
 
         // Assert
         var expected = PostFactory.Response();
-        Assert.Equal(expected, response);
+        Assert.Equivalent(expected, response);
 
         _categoryService.Verify(categoryService =>
                 categoryService.GetEntityByIdAsync(1L), Times.Once);
@@ -99,7 +99,7 @@ public class PostServiceTests
 
         // Assert
         var expected = PostFactory.UpdatedResponse();
-        Assert.Equal(expected, response);
+        Assert.Equivalent(expected, response);
 
         _repository.Verify(repository =>
                 repository.GetByIdAsync(1L), Times.Once);
@@ -138,7 +138,7 @@ public class PostServiceTests
 
         // Assert
         var expected = PostFactory.Response();
-        Assert.Equal(expected, response);
+        Assert.Equivalent(expected, response);
 
         _repository.Verify(repository =>
                 repository.GetByIdAsync(1L), Times.Once);
@@ -171,9 +171,9 @@ public class PostServiceTests
             new PostFiltersRequest(null, null))).ToList();
 
         // Assert
-        var expected = PostFactory.ViewResponse();
-        Assert.Single(response);
-        Assert.Equal(expected, response[0]);
+        var expected = PostFactory.Response();
+        var item = Assert.Single(response);
+        Assert.Equivalent(expected, item);
 
         _repository.Verify(repository =>
                 repository.GetAllAsync(), Times.Once);
@@ -194,9 +194,9 @@ public class PostServiceTests
             new PostFiltersRequest("Like", null))).ToList();
 
         // Assert
-        var expected = PostFactory.ViewResponse();
-        Assert.Single(response);
-        Assert.Equal(expected, response[0]);
+        var expected = PostFactory.Response();
+        var item = Assert.Single(response);
+        Assert.Equivalent(expected, item);
 
         _repository.Verify(repository =>
                 repository.GetAllByTitleContainingAsync("Like"), Times.Once);
@@ -217,9 +217,9 @@ public class PostServiceTests
             new PostFiltersRequest(null, "Movies"))).ToList();
 
         // Assert
-        var expected = PostFactory.ViewResponse();
-        Assert.Single(response);
-        Assert.Equal(expected, response[0]);
+        var expected = PostFactory.Response();
+        var item = Assert.Single(response);
+        Assert.Equivalent(expected, item);
 
         _repository.Verify(repository =>
                 repository.GetAllByCategoryNameContainingAsync("Movies"), Times.Once);
@@ -240,9 +240,9 @@ public class PostServiceTests
             new PostFiltersRequest("Like", "Movies"))).ToList();
 
         // Assert
-        var expected = PostFactory.ViewResponse();
-        Assert.Single(response);
-        Assert.Equal(expected, response[0]);
+        var expected = PostFactory.Response();
+        var item = Assert.Single(response);
+        Assert.Equivalent(expected, item);
 
         _repository.Verify(repository =>
                 repository.GetAllByTitleContainingAndCategoryNameContainingAsync("Like", "Movies"), Times.Once);
@@ -262,9 +262,9 @@ public class PostServiceTests
         var response = (await _service.GetByUserAsync(1L)).ToList();
 
         // Assert
-        var expected = PostFactory.ViewResponse();
-        Assert.Single(response);
-        Assert.Equal(expected, response[0]);
+        var expected = PostFactory.Response();
+        var item = Assert.Single(response);
+        Assert.Equivalent(expected, item);
 
         _repository.Verify(repository =>
                 repository.GetAllByUserIdAsync(1L), Times.Once);
@@ -289,9 +289,9 @@ public class PostServiceTests
         var response = (await _service.GetByAuthenticatedUserAsync()).ToList();
 
         // Assert
-        var expected = PostFactory.ViewResponse();
-        Assert.Single(response);
-        Assert.Equal(expected, response[0]);
+        var expected = PostFactory.Response();
+        var item = Assert.Single(response);
+        Assert.Equivalent(expected, item);
 
         _authorizationService.Verify(authorizationService =>
                 authorizationService.GetAuthenticatedUserAsync(), Times.Once);
@@ -314,8 +314,8 @@ public class PostServiceTests
         var response = await _service.GetByIdAsync(1L);
 
         // Assert
-        var expected = PostFactory.ViewResponse();
-        Assert.Equal(expected, response);
+        var expected = PostFactory.Response();
+        Assert.Equivalent(expected, response);
 
         _repository.Verify(repository =>
                 repository.GetByIdAsync(1L), Times.Once);

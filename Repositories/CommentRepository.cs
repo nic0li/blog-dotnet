@@ -11,6 +11,10 @@ public class CommentRepository(AppDbContext dbContext) : Repository<Comment>(dbC
     {
         return await _dbContext.Comments
             .Include(comment => comment.User)
+            .Include(comment => comment.Post)
+                .ThenInclude(post => post.Category)
+            .Include(comment => comment.Post)
+                .ThenInclude(post => post.User)
             .FirstOrDefaultAsync(comment => comment.Id == id);
     }
 
@@ -18,6 +22,10 @@ public class CommentRepository(AppDbContext dbContext) : Repository<Comment>(dbC
     {
         return await _dbContext.Comments
             .Include(comment => comment.User)
+            .Include(comment => comment.Post)
+                .ThenInclude(post => post.Category)
+            .Include(comment => comment.Post)
+                .ThenInclude(post => post.User)
             .ToListAsync();
     }
 
@@ -25,6 +33,10 @@ public class CommentRepository(AppDbContext dbContext) : Repository<Comment>(dbC
     {
         return await _dbContext.Comments
             .Include(comment => comment.User)
+            .Include(comment => comment.Post)
+                .ThenInclude(post => post.Category)
+            .Include(comment => comment.Post)
+                .ThenInclude(post => post.User)
             .Where(comment => comment.PostId == postId)
             .ToListAsync();
     }

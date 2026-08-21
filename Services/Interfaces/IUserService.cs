@@ -4,10 +4,10 @@ namespace Blog.Services.Interfaces;
 
 public interface IUserService : ICrudService<
     UserResponse,
-    UserViewResponse,
+    UserProfileResponse,
     UserCreateRequest>
 {
-    Task<IEnumerable<UserViewResponse>> GetAllAsync();
+    Task<IEnumerable<UserProfileResponse>> GetAllAsync();
 
     Task<UserResponse> GetMeAsync();
 

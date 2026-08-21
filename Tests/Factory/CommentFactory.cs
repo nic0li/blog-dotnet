@@ -38,15 +38,6 @@ public static class CommentFactory
         return Response("Updated comment!");
     }
 
-    public static CommentViewResponse ViewResponse()
-    {
-        return new CommentViewResponse(1L,
-            "Great post!",
-            UserFactory.ViewResponse(),
-            MockDate,
-            MockDate);
-    }
-
     private static Comment Comment(string content)
     {
         return new Comment
@@ -64,8 +55,9 @@ public static class CommentFactory
     {
         return new CommentResponse(1L,
             content,
-            UserFactory.Response(),
             MockDate,
-            MockDate);
+            MockDate,
+            UserFactory.ProfileResponse(),
+            PostFactory.ResponseWithoutComments());
     }
 }

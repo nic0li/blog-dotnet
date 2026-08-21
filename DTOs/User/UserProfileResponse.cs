@@ -1,6 +1,6 @@
 ﻿namespace Blog.DTOs.User;
 
-public record UserViewResponse(
+public record UserProfileResponse(
     long Id,
     string? Name,
     string? Photo,

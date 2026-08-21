@@ -14,7 +14,7 @@ public class UserService(
     IAuthorizationService authorizationService) : CrudService<
     User,
     UserResponse,
-    UserViewResponse,
+    UserProfileResponse,
     UserCreateRequest,
     UserUpdateRequest>(repository),
     IUserService
@@ -47,18 +47,18 @@ public class UserService(
         await DeleteUserAsync(user);
     }
 
-    public override async Task<UserViewResponse> GetByIdAsync(long id)
+    public override async Task<UserProfileResponse> GetByIdAsync(long id)
     {
         var user = await GetEntityByIdAsync(id);
 
-        return UserMapper.ToViewResponse(user);
+        return UserMapper.ToProfileResponse(user);
     }
 
-    public async Task<IEnumerable<UserViewResponse>> GetAllAsync()
+    public async Task<IEnumerable<UserProfileResponse>> GetAllAsync()
     {
         var users = await _repository.GetAllAsync();
 
-        return users.Select(UserMapper.ToViewResponse);
+        return users.Select(UserMapper.ToProfileResponse);
     }
 
     public async Task<UserResponse> GetMeAsync()

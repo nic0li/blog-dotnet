@@ -4,10 +4,10 @@ namespace Blog.Services.Interfaces;
 
 public interface ICommentService : ICrudService<
     CommentResponse,
-    CommentViewResponse,
+    CommentResponse,
     CommentCreateRequest>
 {
     Task<CommentResponse> UpdateAsync(long id, CommentUpdateRequest request);
 
-    Task<IEnumerable<CommentViewResponse>> GetAllAsync();
+    Task<IEnumerable<CommentResponse>> GetAllAsync();
 }

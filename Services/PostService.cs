@@ -12,7 +12,7 @@ public class PostService(
     ICategoryService categoryService) : CrudService<
     Post,
     PostResponse,
-    PostViewResponse,
+    PostResponse,
     PostCreateRequest,
     PostUpdateRequest>(repository),
     IPostService
@@ -67,28 +67,28 @@ public class PostService(
         await _repository.SaveChangesAsync();
     }
 
-    public override async Task<PostViewResponse> GetByIdAsync(long id)
+    public override async Task<PostResponse> GetByIdAsync(long id)
     {
         var post = await GetEntityByIdAsync(id);
 
-        return PostMapper.ToViewResponse(post);
+        return PostMapper.ToResponse(post);
     }
 
-    public async Task<IEnumerable<PostViewResponse>> GetAllAsync(PostFiltersRequest request)
+    public async Task<IEnumerable<PostResponse>> GetAllAsync(PostFiltersRequest request)
     {
         var posts = await FindPostsAsync(request);
 
-        return [.. posts.Select(PostMapper.ToViewResponse)];
+        return [.. posts.Select(PostMapper.ToResponse)];
     }
 
-    public async Task<IEnumerable<PostViewResponse>> GetByUserAsync(long userId)
+    public async Task<IEnumerable<PostResponse>> GetByUserAsync(long userId)
     {
         var posts = await _repository.GetAllByUserIdAsync(userId);
 
-        return [.. posts.Select(PostMapper.ToViewResponse)];
+        return [.. posts.Select(PostMapper.ToResponse)];
     }
 
-    public async Task<IEnumerable<PostViewResponse>> GetByAuthenticatedUserAsync()
+    public async Task<IEnumerable<PostResponse>> GetByAuthenticatedUserAsync()
     {
         var user = await _authorizationService.GetAuthenticatedUserAsync();
 
@@ -97,8 +97,7 @@ public class PostService(
 
     private async Task<IEnumerable<Post>> FindPostsAsync(PostFiltersRequest request)
     {
-        if (!string.IsNullOrWhiteSpace(request.Title) &&
-            !string.IsNullOrWhiteSpace(request.Category))
+        if (request.HasTitle && request.HasCategory)
         {
             return await _repository
                 .GetAllByTitleContainingAndCategoryNameContainingAsync(
@@ -106,12 +105,12 @@ public class PostService(
                     request.Category);
         }
 
-        if (!string.IsNullOrWhiteSpace(request.Title))
+        if (request.HasTitle)
         {
             return await _repository.GetAllByTitleContainingAsync(request.Title);
         }
 
-        if (!string.IsNullOrWhiteSpace(request.Category))
+        if (request.HasCategory)
         {
             return await _repository.GetAllByCategoryNameContainingAsync(request.Category);
         }

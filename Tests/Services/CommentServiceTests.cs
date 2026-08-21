@@ -125,10 +125,9 @@ public class CommentServiceTests
         var response = (await _service.GetAllAsync()).ToList();
 
         // Assert
-        Assert.Single(response);
-
-        var expected = CommentFactory.ViewResponse();
-        Assert.Equal(expected, response[0]);
+        var item = Assert.Single(response);
+        var expected = CommentFactory.Response();
+        Assert.Equal(expected, item);
 
         _repository.Verify(repository =>
                 repository.GetAllAsync(), Times.Once);
@@ -166,7 +165,7 @@ public class CommentServiceTests
         var response = await _service.GetByIdAsync(1L);
 
         // Assert
-        var expected = CommentFactory.ViewResponse();
+        var expected = CommentFactory.Response();
         Assert.Equal(expected, response);
 
         _repository.Verify(repository =>
