@@ -19,14 +19,29 @@ public static class PostFactory
         return Post("I love drama", "Updated content");
     }
 
-    public static PostCreateRequest CreateRequest()
+    public static PostRequest CreateRequest()
     {
-        return new PostCreateRequest("I like drama", "Content", 1L);
+        return new PostRequest("I like drama", "Content", 1L);
     }
 
-    public static PostUpdateRequest UpdateRequest()
+    public static PostRequest CreateRequestWithoutTitle()
     {
-        return new PostUpdateRequest("I love drama", "Updated content", 1L);
+        return new PostRequest(null, "Content", 1L);
+    }
+
+    public static PostRequest CreateRequestWithoutContent()
+    {
+        return new PostRequest("I like drama", null, 1L);
+    }
+
+    public static PostRequest CreateRequestWithoutCategory()
+    {
+        return new PostRequest("I like drama", "Content", null);
+    }
+
+    public static PostRequest UpdateRequest()
+    {
+        return new PostRequest("I love drama", "Updated content", 1L);
     }
 
     public static PostResponse Response()
@@ -37,11 +52,6 @@ public static class PostFactory
     public static PostResponse UpdatedResponse()
     {
         return Response("I love drama", "Updated content", []);
-    }
-
-    public static PostResponse ResponseWithoutComments()
-    {
-        return Response("I like drama", "Content", null);
     }
 
     private static Post Post(string title, string content)

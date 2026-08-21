@@ -32,10 +32,9 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldCreateCommentSuccessfully()
     {
         // Arrange
-        var request = CommentFactory.CreateRequest();
+        var request = CommentFactory.Request();
         var comment = CommentFactory.Comment();
         var post = PostFactory.Post();
-        var user = UserFactory.User();
 
         _postService.Setup(postService =>
                 postService.GetEntityByIdAsync(1L))
@@ -43,7 +42,7 @@ public class CommentServiceTests
 
         _authorizationService.Setup(authorizationService =>
                 authorizationService.GetAuthenticatedUserAsync())
-            .ReturnsAsync(user);
+            .ReturnsAsync(UserFactory.User());
 
         _repository.Setup(repository =>
                 repository.AddAsync(It.IsAny<Comment>()))
@@ -56,11 +55,11 @@ public class CommentServiceTests
             .Returns(Task.CompletedTask);
 
         // Act
-        var response = await _service.CreateAsync(request);
+        var response = await _service.CreateAsync(post.Id,request);
 
         // Assert
         var expected = CommentFactory.Response();
-        Assert.Equal(expected, response);
+        Assert.Equivalent(expected, response);
 
         _postService.Verify(postService =>
                 postService.GetEntityByIdAsync(1L), Times.Once);
@@ -96,7 +95,7 @@ public class CommentServiceTests
 
         // Assert
         var expected = CommentFactory.UpdatedResponse();
-        Assert.Equal(expected, response);
+        Assert.Equivalent(expected, response);
 
         _repository.Verify(repository =>
                 repository.GetByIdAsync(1L), Times.Once);
@@ -125,9 +124,9 @@ public class CommentServiceTests
         var response = (await _service.GetAllAsync()).ToList();
 
         // Assert
-        var item = Assert.Single(response);
+        var itemResponse = Assert.Single(response);
         var expected = CommentFactory.Response();
-        Assert.Equal(expected, item);
+        Assert.Equivalent(expected, itemResponse);
 
         _repository.Verify(repository =>
                 repository.GetAllAsync(), Times.Once);
@@ -166,7 +165,7 @@ public class CommentServiceTests
 
         // Assert
         var expected = CommentFactory.Response();
-        Assert.Equal(expected, response);
+        Assert.Equivalent(expected, response);
 
         _repository.Verify(repository =>
                 repository.GetByIdAsync(1L), Times.Once);

@@ -5,19 +5,16 @@ namespace Blog.Mappers;
 
 public static class CommentMapper
 {
-    public static Comment CreateEntity(CommentCreateRequest request)
+    public static Comment CreateEntity(CommentRequest request)
     {
         var comment = new Comment
         {
             Content = request.Content
         };
-
         return comment;
     }
 
-    public static void UpdateEntity(
-        Comment comment,
-        CommentUpdateRequest request)
+    public static void UpdateEntity(Comment comment, CommentRequest request)
     {
         if (request.Content is not null)
         {
@@ -35,14 +32,12 @@ public static class CommentMapper
         return ToResponse(comment, false);
     }
 
-    public static List<CommentResponse> ToListResponseWithoutPost(
-        IEnumerable<Comment> comments)
+    public static List<CommentResponse> ToListResponseWithoutPost(IEnumerable<Comment> comments)
     {
         return [.. comments.Select(ToResponseWithoutPost)];
     }
 
-    private static CommentResponse ToResponse(Comment comment,
-        bool includePost)
+    private static CommentResponse ToResponse(Comment comment, bool includePost)
     {
         return new CommentResponse(
             comment.Id,

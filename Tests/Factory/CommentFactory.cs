@@ -18,14 +18,14 @@ public static class CommentFactory
         return Comment("Updated comment!");
     }
 
-    public static CommentCreateRequest CreateRequest()
+    public static CommentRequest Request()
     {
-        return new CommentCreateRequest("Great post!", 1L);
+        return new CommentRequest("Great post!");
     }
 
-    public static CommentUpdateRequest UpdateRequest()
+    public static CommentRequest UpdateRequest()
     {
-        return new CommentUpdateRequest("Updated comment!");
+        return new CommentRequest("Updated comment!");
     }
 
     public static CommentResponse Response()
@@ -58,6 +58,6 @@ public static class CommentFactory
             MockDate,
             MockDate,
             UserFactory.ProfileResponse(),
-            PostFactory.ResponseWithoutComments());
+            PostFactory.Response());
     }
 }

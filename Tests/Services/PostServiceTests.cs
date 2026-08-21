@@ -1,7 +1,7 @@
 ﻿using Blog.DTOs.Post;
 using Blog.Entities;
+using Blog.Exceptions;
 using Blog.Repositories.Interfaces;
-using Blog.Security.Interfaces;
 using Blog.Services;
 using Blog.Services.Interfaces;
 using Blog.Tests.Factory;
@@ -76,6 +76,63 @@ public class PostServiceTests
     }
 
     [Fact]
+    public async Task CreateAsync_ShouldThrowWhenTitleIsMissing()
+    {
+        // Arrange
+        var request = PostFactory.CreateRequestWithoutTitle();
+
+        // Act / Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            () => _service.CreateAsync(request));
+
+        Assert.Equal("All fields are required.", exception.Message);
+
+        _repository.Verify(repository => 
+        repository.AddAsync(It.IsAny<Post>()), Times.Never);
+
+        _categoryService.VerifyNoOtherCalls();
+        _authorizationService.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldThrowWhenContentIsMissing()
+    {
+        // Arrange
+        var request = PostFactory.CreateRequestWithoutContent();
+
+        // Act / Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            () => _service.CreateAsync(request));
+
+        Assert.Equal("All fields are required.", exception.Message);
+
+        _repository.Verify(repository => 
+        repository.AddAsync(It.IsAny<Post>()), Times.Never);
+
+        _categoryService.VerifyNoOtherCalls();
+        _authorizationService.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldThrowWhenCategoryIsMissing()
+    {
+        // Arrange
+        var request = PostFactory.CreateRequestWithoutCategory();
+
+        // Act / Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            () => _service.CreateAsync(request));
+
+        Assert.Equal("All fields are required.", exception.Message);
+
+        _repository.Verify(repository => 
+        repository.AddAsync(It.IsAny<Post>()), Times.Never);
+
+        _categoryService.VerifyNoOtherCalls();
+        _authorizationService.VerifyNoOtherCalls();
+    }
+
+    [Fact]
     public async Task UpdateAsync_ShouldUpdatePostSuccessfully()
     {
         // Arrange
@@ -121,7 +178,7 @@ public class PostServiceTests
     public async Task UpdateAsync_ShouldUpdatePostWithoutChangingCategory()
     {
         // Arrange
-        var request = new PostUpdateRequest(null, null, null);
+        var request = new PostRequest(null, null, null);
 
         var post = PostFactory.Post();
 
@@ -171,9 +228,9 @@ public class PostServiceTests
             new PostFiltersRequest(null, null))).ToList();
 
         // Assert
+        var itemResponse = Assert.Single(response);
         var expected = PostFactory.Response();
-        var item = Assert.Single(response);
-        Assert.Equivalent(expected, item);
+        Assert.Equivalent(expected, itemResponse);
 
         _repository.Verify(repository =>
                 repository.GetAllAsync(), Times.Once);
@@ -186,7 +243,7 @@ public class PostServiceTests
         var post = PostFactory.Post();
 
         _repository.Setup(repository =>
-                repository.GetAllByTitleContainingAsync("Like"))
+                repository.GetAllByTitleAsync("Like"))
             .ReturnsAsync([post]);
 
         // Act
@@ -194,12 +251,12 @@ public class PostServiceTests
             new PostFiltersRequest("Like", null))).ToList();
 
         // Assert
+        var itemResponse = Assert.Single(response);
         var expected = PostFactory.Response();
-        var item = Assert.Single(response);
-        Assert.Equivalent(expected, item);
+        Assert.Equivalent(expected, itemResponse);
 
         _repository.Verify(repository =>
-                repository.GetAllByTitleContainingAsync("Like"), Times.Once);
+                repository.GetAllByTitleAsync("Like"), Times.Once);
     }
 
     [Fact]
@@ -209,7 +266,7 @@ public class PostServiceTests
         var post = PostFactory.Post();
 
         _repository.Setup(repository =>
-                repository.GetAllByCategoryNameContainingAsync("Movies"))
+                repository.GetAllByCategoryNameAsync("Movies"))
             .ReturnsAsync([post]);
 
         // Act
@@ -217,12 +274,12 @@ public class PostServiceTests
             new PostFiltersRequest(null, "Movies"))).ToList();
 
         // Assert
+        var itemResponse = Assert.Single(response);
         var expected = PostFactory.Response();
-        var item = Assert.Single(response);
-        Assert.Equivalent(expected, item);
+        Assert.Equivalent(expected, itemResponse);
 
         _repository.Verify(repository =>
-                repository.GetAllByCategoryNameContainingAsync("Movies"), Times.Once);
+                repository.GetAllByCategoryNameAsync("Movies"), Times.Once);
     }
 
     [Fact]
@@ -232,7 +289,7 @@ public class PostServiceTests
         var post = PostFactory.Post();
 
         _repository.Setup(repository =>
-                repository.GetAllByTitleContainingAndCategoryNameContainingAsync("Like", "Movies"))
+                repository.GetAllByTitleAndCategoryNameAsync("Like", "Movies"))
             .ReturnsAsync([post]);
 
         // Act
@@ -240,12 +297,12 @@ public class PostServiceTests
             new PostFiltersRequest("Like", "Movies"))).ToList();
 
         // Assert
+        var itemResponse = Assert.Single(response);
         var expected = PostFactory.Response();
-        var item = Assert.Single(response);
-        Assert.Equivalent(expected, item);
+        Assert.Equivalent(expected, itemResponse);
 
         _repository.Verify(repository =>
-                repository.GetAllByTitleContainingAndCategoryNameContainingAsync("Like", "Movies"), Times.Once);
+                repository.GetAllByTitleAndCategoryNameAsync("Like", "Movies"), Times.Once);
     }
 
     [Fact]
@@ -253,6 +310,8 @@ public class PostServiceTests
     {
         // Arrange
         var post = PostFactory.Post();
+        var comment = CommentFactory.Comment();
+        post.Comments.Add(comment);
 
         _repository.Setup(repository =>
                 repository.GetAllByUserIdAsync(1L))
@@ -262,9 +321,11 @@ public class PostServiceTests
         var response = (await _service.GetByUserAsync(1L)).ToList();
 
         // Assert
+        var itemResponse = Assert.Single(response);
+        var commentWithoutPost = Assert.Single(itemResponse.Comments!);
         var expected = PostFactory.Response();
-        var item = Assert.Single(response);
-        Assert.Equivalent(expected, item);
+        Assert.Equivalent(expected, itemResponse);
+        Assert.Null(commentWithoutPost.Post);
 
         _repository.Verify(repository =>
                 repository.GetAllByUserIdAsync(1L), Times.Once);
@@ -289,9 +350,9 @@ public class PostServiceTests
         var response = (await _service.GetByAuthenticatedUserAsync()).ToList();
 
         // Assert
+        var itemResponse = Assert.Single(response);
         var expected = PostFactory.Response();
-        var item = Assert.Single(response);
-        Assert.Equivalent(expected, item);
+        Assert.Equivalent(expected, itemResponse);
 
         _authorizationService.Verify(authorizationService =>
                 authorizationService.GetAuthenticatedUserAsync(), Times.Once);

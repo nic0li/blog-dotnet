@@ -9,24 +9,18 @@ namespace Blog.Services;
 public class CommentService(
     ICommentRepository repository,
     IAuthorizationService authorizationService,
-    IPostService postService) : CrudService<
-    Comment,
-    CommentResponse,
-    CommentResponse,
-    CommentCreateRequest,
-    CommentUpdateRequest>(repository),
-    ICommentService
+    IPostService postService)
+    : EntityService<Comment>(repository), ICommentService
 {
     private readonly ICommentRepository _repository = repository;
     private readonly IAuthorizationService _authorizationService = authorizationService;
     private readonly IPostService _postService = postService;
 
-    public override async Task<CommentResponse> CreateAsync(CommentCreateRequest request)
+    public async Task<CommentResponse> CreateAsync(long postId, CommentRequest request)
     {
         var comment = CommentMapper.CreateEntity(request);
 
-        comment.Post = await _postService.GetEntityByIdAsync(request.PostId);
-
+        comment.Post = await _postService.GetEntityByIdAsync(postId);
         comment.User = await _authorizationService.GetAuthenticatedUserAsync();
 
         await _repository.AddAsync(comment);
@@ -35,7 +29,7 @@ public class CommentService(
         return CommentMapper.ToResponse(comment);
     }
 
-    public async Task<CommentResponse> UpdateAsync(long id, CommentUpdateRequest request)
+    public async Task<CommentResponse> UpdateAsync(long id, CommentRequest request)
     {
         var comment = await GetEntityByIdAsync(id);
 
@@ -44,24 +38,22 @@ public class CommentService(
         CommentMapper.UpdateEntity(comment, request);
 
         _repository.Update(comment);
-
         await _repository.SaveChangesAsync();
 
         return CommentMapper.ToResponse(comment);
     }
 
-    public override async Task DeleteAsync(long id)
+    public async Task DeleteAsync(long id)
     {
         var comment = await GetEntityByIdAsync(id);
 
         await _authorizationService.ValidateOwnerOrAdminAsync(comment.User);
 
         _repository.Delete(comment);
-
         await _repository.SaveChangesAsync();
     }
 
-    public override async Task<CommentResponse> GetByIdAsync(long id)
+    public async Task<CommentResponse> GetByIdAsync(long id)
     {
         var comment = await GetEntityByIdAsync(id);
 

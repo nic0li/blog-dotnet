@@ -3,14 +3,15 @@ using Blog.Entities;
 
 namespace Blog.Services.Interfaces;
 
-public interface ICategoryService : ICrudService<
-    CategoryResponse,
-    CategoryResponse,
-    CategoryRequest>
+public interface ICategoryService : IEntityService<Category>
 {
+    Task<CategoryResponse> CreateAsync(CategoryRequest request);
+
     Task<CategoryResponse> UpdateAsync(long id, CategoryRequest request);
 
-    Task<Category> GetEntityByIdAsync(long id);
+    Task DeleteAsync(long id);
+
+    Task<CategoryResponse> GetByIdAsync(long id);
 
     Task<IEnumerable<CategoryResponse>> GetAllAsync(string? name);
 }

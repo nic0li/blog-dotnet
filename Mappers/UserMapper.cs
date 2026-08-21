@@ -13,13 +13,10 @@ public static class UserMapper
             Email = request.Email,
             Password = request.Password
         };
-
         return user;
     }
 
-    public static void UpdateEntity(
-        User user,
-        UserUpdateRequest request)
+    public static void UpdateEntity(User user, UserUpdateRequest request)
     {
         if (request.EmailProvided && !string.IsNullOrWhiteSpace(request.Email))
         {

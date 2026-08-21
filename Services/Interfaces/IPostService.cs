@@ -3,14 +3,15 @@ using Blog.Entities;
 
 namespace Blog.Services.Interfaces;
 
-public interface IPostService : ICrudService<
-    PostResponse,
-    PostResponse,
-    PostCreateRequest>
+public interface IPostService : IEntityService<Post>
 {
-    Task<PostResponse> UpdateAsync(long id, PostUpdateRequest request);
+    Task<PostResponse> CreateAsync(PostRequest request);
 
-    Task<Post> GetEntityByIdAsync(long id);
+    Task<PostResponse> UpdateAsync(long id, PostRequest request);
+
+    Task DeleteAsync(long id);
+
+    Task<PostResponse> GetByIdAsync(long id);
 
     Task<IEnumerable<PostResponse>> GetAllAsync(PostFiltersRequest request);
 

@@ -9,24 +9,19 @@ namespace Blog.Services;
 
 public class CategoryService(
     ICategoryRepository repository,
-    IAuthorizationService authorizationService) : CrudService<
-    Category,
-    CategoryResponse,
-    CategoryResponse,
-    CategoryRequest,
-    CategoryRequest>(repository),
-    ICategoryService
+    IAuthorizationService authorizationService)
+    : EntityService<Category>(repository), ICategoryService
 {
     private readonly ICategoryRepository _repository = repository;
     private readonly IAuthorizationService _authorizationService = authorizationService;
 
-    public override async Task<CategoryResponse> CreateAsync(CategoryRequest request)
+    public async Task<CategoryResponse> CreateAsync(CategoryRequest request)
     {
         await _authorizationService.ValidateAdminAsync();
 
         await ValidateUniqueNameAsync(request.Name, null);
 
-        var category = CategoryMapper.ToEntity(request);
+        var category = CategoryMapper.CreateEntity(request);
 
         await _repository.AddAsync(category);
         await _repository.SaveChangesAsync();
@@ -51,7 +46,7 @@ public class CategoryService(
         return CategoryMapper.ToResponse(category);
     }
 
-    public override async Task DeleteAsync(long id)
+    public async Task DeleteAsync(long id)
     {
         await _authorizationService.ValidateAdminAsync();
 
@@ -62,7 +57,7 @@ public class CategoryService(
         await _repository.SaveChangesAsync();
     }
 
-    public override async Task<CategoryResponse> GetByIdAsync(long id)
+    public async Task<CategoryResponse> GetByIdAsync(long id)
     {
         var category = await GetEntityByIdAsync(id);
 

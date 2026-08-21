@@ -12,32 +12,8 @@ public class CommentController(ICommentService service) : ControllerBase
 {
     private readonly ICommentService _service = service;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<CommentResponse>>> GetAll()
-    {
-        var response = await _service.GetAllAsync();
-
-        return Ok(response);
-    }
-
-    [HttpGet("{id:long}")]
-    public async Task<ActionResult<CommentResponse>> GetById(long id)
-    {
-        var response = await _service.GetByIdAsync(id);
-
-        return Ok(response);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<CommentResponse>> Create(CommentCreateRequest request)
-    {
-        var response = await _service.CreateAsync(request);
-
-        return StatusCode(StatusCodes.Status201Created, response);
-    }
-
     [HttpPatch("{id:long}")]
-    public async Task<ActionResult<CommentResponse>> Update(long id, CommentUpdateRequest request)
+    public async Task<ActionResult<CommentResponse>> Update(long id, CommentRequest request)
     {
         var response = await _service.UpdateAsync(id, request);
 

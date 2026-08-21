@@ -1,21 +1,25 @@
 ﻿using Blog.DTOs.User;
+using Blog.Entities;
 
 namespace Blog.Services.Interfaces;
 
-public interface IUserService : ICrudService<
-    UserResponse,
-    UserProfileResponse,
-    UserCreateRequest>
+public interface IUserService : IEntityService<User>
 {
+    Task<UserResponse> CreateAsync(UserCreateRequest request);
+
+    Task<UserProfileResponse> GetByIdAsync(long id);
+
     Task<IEnumerable<UserProfileResponse>> GetAllAsync();
 
-    Task<UserResponse> GetMeAsync();
+    Task<UserResponse> ToggleUserRoleAsync(long id);
 
-    Task<UserResponse> UpdateMeAsync(UserUpdateRequest request);
+    Task DeleteUserAsync(long id);
 
-    Task DeleteMeAsync();
+    Task<UserResponse> GetAuthenticatedAsync();
 
-    Task UpdatePasswordAsync(UserPasswordUpdateRequest request);
+    Task<UserResponse> UpdateAuthenticatedAsync(UserUpdateRequest request);
 
-    Task<UserResponse> ToggleRoleAsync(long id);
+    Task UpdateAuthenticatedPasswordAsync(UserPasswordUpdateRequest request);
+
+    Task DeleteAuthenticatedAsync();
 }

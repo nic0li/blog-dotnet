@@ -27,7 +27,7 @@ public class AuthenticationController(
 
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<ActionResult<UserResponse>> Create(UserCreateRequest request)
+    public async Task<ActionResult<UserResponse>> Register(UserCreateRequest request)
     {
         var response = await _userService.CreateAsync(request);
 

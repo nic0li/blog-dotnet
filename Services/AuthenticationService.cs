@@ -7,44 +7,30 @@ using Blog.Services.Interfaces;
 
 namespace Blog.Services;
 
-public class AuthenticationService : IAuthenticationService
+public class AuthenticationService(
+    IUserRepository repository,
+    IJwtService jwtService,
+    IPasswordService passwordService,
+    ICurrentUserService currentUserService) : IAuthenticationService
 {
-    private readonly IUserRepository _repository;
-    private readonly IJwtService _jwtService;
-    private readonly IPasswordService _passwordService;
-    private readonly ICurrentUserService _currentUserService;
-
-    public AuthenticationService(
-        IUserRepository repository,
-        IJwtService jwtService,
-        IPasswordService passwordService,
-        ICurrentUserService currentUserService)
-    {
-        _repository = repository;
-        _jwtService = jwtService;
-        _passwordService = passwordService;
-        _currentUserService = currentUserService;
-    }
+    private readonly IUserRepository _repository = repository;
+    private readonly IJwtService _jwtService = jwtService;
+    private readonly IPasswordService _passwordService = passwordService;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     public async Task<AuthenticationResponse> AuthenticateAsync(
         AuthenticationRequest request)
     {
         var user = await _repository.GetByEmailAsync(request.Login);
 
-        if (user is null ||
-            !_passwordService.Verify(
-                request.Password,
-                user.Password))
+        if (user is null || !_passwordService.Verify(request.Password, user.Password))
         {
-            throw new UnauthorizedAccessException(
-                "Invalid credentials");
+            throw new UnauthorizedAccessException("Invalid credentials");
         }
 
         var token = _jwtService.GenerateToken(user.Id);
 
-        return new AuthenticationResponse(
-            UserMapper.ToResponse(user),
-            token);
+        return new AuthenticationResponse(UserMapper.ToResponse(user), token);
     }
 
     public async Task<User> GetAuthenticatedUserAsync()
@@ -53,12 +39,8 @@ public class AuthenticationService : IAuthenticationService
 
         var user = await _repository.GetByIdAsync(userId);
 
-        if (user is null)
-        {
-            throw new UnauthorizedAccessException(
-                "User not authenticated");
-        }
-
-        return user;
+        return user is null
+            ? throw new UnauthorizedAccessException("User not authenticated")
+            : user;
     }
 }

@@ -11,19 +11,14 @@ namespace Blog.Services;
 public class UserService(
     IUserRepository repository,
     IPasswordService passwordService,
-    IAuthorizationService authorizationService) : CrudService<
-    User,
-    UserResponse,
-    UserProfileResponse,
-    UserCreateRequest,
-    UserUpdateRequest>(repository),
-    IUserService
+    IAuthorizationService authorizationService)
+    : EntityService<User>(repository), IUserService
 {
     private readonly IUserRepository _repository = repository;
     private readonly IPasswordService _passwordService = passwordService;
     private readonly IAuthorizationService _authorizationService = authorizationService;
 
-    public override async Task<UserResponse> CreateAsync(UserCreateRequest request)
+    public async Task<UserResponse> CreateAsync(UserCreateRequest request)
     {
         await ValidateEmailAvailabilityAsync(request.Email, null);
 
@@ -38,16 +33,7 @@ public class UserService(
         return UserMapper.ToResponse(user);
     }
 
-    public override async Task DeleteAsync(long id)
-    {
-        var user = await GetEntityByIdAsync(id);
-
-        await _authorizationService.ValidateOwnerOrAdminAsync(user);
-
-        await DeleteUserAsync(user);
-    }
-
-    public override async Task<UserProfileResponse> GetByIdAsync(long id)
+    public async Task<UserProfileResponse> GetByIdAsync(long id)
     {
         var user = await GetEntityByIdAsync(id);
 
@@ -61,46 +47,7 @@ public class UserService(
         return users.Select(UserMapper.ToProfileResponse);
     }
 
-    public async Task<UserResponse> GetMeAsync()
-    {
-        var user = await _authorizationService.GetAuthenticatedUserAsync();
-
-        return UserMapper.ToResponse(user);
-    }
-
-    public async Task<UserResponse> UpdateMeAsync(UserUpdateRequest request)
-    {
-        var user = await _authorizationService.GetAuthenticatedUserAsync();
-
-        return await UpdateUserResponseAsync(user, request);
-    }
-
-    public async Task DeleteMeAsync()
-    {
-        var user = await _authorizationService.GetAuthenticatedUserAsync();
-
-        await DeleteUserAsync(user);
-    }
-
-    public async Task UpdatePasswordAsync(UserPasswordUpdateRequest request)
-    {
-        var user = await _authorizationService.GetAuthenticatedUserAsync();
-
-        var passwordIsValid = _passwordService.Verify(request.CurrentPassword, user.Password);
-
-        if (!passwordIsValid)
-        {
-            throw new UnauthorizedAccessException("Invalid current password");
-        }
-
-        user.Password = _passwordService.Hash(request.NewPassword);
-
-        _repository.Update(user);
-
-        await _repository.SaveChangesAsync();
-    }
-
-    public async Task<UserResponse> ToggleRoleAsync(long id)
+    public async Task<UserResponse> ToggleUserRoleAsync(long id)
     {
         await _authorizationService.ValidateAdminAsync();
 
@@ -124,7 +71,59 @@ public class UserService(
         return UserMapper.ToResponse(user);
     }
 
-    private async Task<UserResponse> UpdateUserResponseAsync(User user, UserUpdateRequest request)
+    public async Task DeleteUserAsync(long id)
+    {
+        var user = await GetEntityByIdAsync(id);
+
+        await _authorizationService.ValidateOwnerOrAdminAsync(user);
+
+        _repository.Delete(user);
+
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task<UserResponse> GetAuthenticatedAsync()
+    {
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
+
+        return UserMapper.ToResponse(user);
+    }
+
+    public async Task<UserResponse> UpdateAuthenticatedAsync(UserUpdateRequest request)
+    {
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
+
+        return await UpdateUserAsync(request, user);
+    }
+
+    public async Task UpdateAuthenticatedPasswordAsync(UserPasswordUpdateRequest request)
+    {
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
+
+        var passwordIsValid = _passwordService.Verify(request.CurrentPassword, user.Password);
+
+        if (!passwordIsValid)
+        {
+            throw new UnauthorizedAccessException("Invalid current password");
+        }
+
+        user.Password = _passwordService.Hash(request.NewPassword);
+
+        _repository.Update(user);
+
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task DeleteAuthenticatedAsync()
+    {
+        var user = await _authorizationService.GetAuthenticatedUserAsync();
+
+        _repository.Delete(user);
+
+        await _repository.SaveChangesAsync();
+    }
+
+    private async Task<UserResponse> UpdateUserAsync(UserUpdateRequest request, User user)
     {
         if (request.EmailProvided
             && !string.IsNullOrEmpty(request.Email))
@@ -141,20 +140,13 @@ public class UserService(
         return UserMapper.ToResponse(user);
     }
 
-    private async Task DeleteUserAsync(User user)
-    {
-        _repository.Delete(user);
-
-        await _repository.SaveChangesAsync();
-    }
-
     private async Task ValidateEmailAvailabilityAsync(string email, long? userId)
     {
         var userByEmail = await _repository.GetByEmailAsync(email);
 
-        var emailAlreadyExists = userByEmail is not null;
+        bool emailAlreadyExists = userByEmail is not null;
 
-        var emailBelongsToAnotherUser = emailAlreadyExists && userByEmail!.Id != userId;
+        bool emailBelongsToAnotherUser = emailAlreadyExists && userByEmail!.Id != userId;
 
         if (emailAlreadyExists && emailBelongsToAnotherUser)
         {

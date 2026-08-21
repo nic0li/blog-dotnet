@@ -2,10 +2,7 @@
 
 namespace Blog.DTOs.Comment;
 
-public record CommentCreateRequest(
+public record CommentRequest(
     [Required]
-    string Content,
-
-    [Required]
-    long PostId
+    string Content
 );

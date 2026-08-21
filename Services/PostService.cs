@@ -1,5 +1,6 @@
 ﻿using Blog.DTOs.Post;
 using Blog.Entities;
+using Blog.Exceptions;
 using Blog.Mappers;
 using Blog.Repositories.Interfaces;
 using Blog.Services.Interfaces;
@@ -9,25 +10,23 @@ namespace Blog.Services;
 public class PostService(
     IPostRepository repository,
     IAuthorizationService authorizationService,
-    ICategoryService categoryService) : CrudService<
-    Post,
-    PostResponse,
-    PostResponse,
-    PostCreateRequest,
-    PostUpdateRequest>(repository),
-    IPostService
+    ICategoryService categoryService)
+    : EntityService<Post>(repository), IPostService
 {
     private readonly IPostRepository _repository = repository;
     private readonly IAuthorizationService _authorizationService = authorizationService;
     private readonly ICategoryService _categoryService = categoryService;
 
-    public override async Task<PostResponse> CreateAsync(
-        PostCreateRequest request)
+    public async Task<PostResponse> CreateAsync(PostRequest request)
     {
+        if (!request.HasTitle || !request.HasContent || !request.HasCategoryId)
+        {
+            throw new BadRequestException("All fields are required.");
+        }
+
         var post = PostMapper.CreateEntity(request);
 
-        post.Category = await _categoryService.GetEntityByIdAsync(request.CategoryId);
-
+        post.Category = await _categoryService.GetEntityByIdAsync(request.CategoryId!.Value);
         post.User = await _authorizationService.GetAuthenticatedUserAsync();
 
         await _repository.AddAsync(post);
@@ -36,7 +35,7 @@ public class PostService(
         return PostMapper.ToResponse(post);
     }
 
-    public async Task<PostResponse> UpdateAsync(long id, PostUpdateRequest request)
+    public async Task<PostResponse> UpdateAsync(long id, PostRequest request)
     {
         var post = await GetEntityByIdAsync(id);
 
@@ -56,7 +55,7 @@ public class PostService(
         return PostMapper.ToResponse(post);
     }
 
-    public override async Task DeleteAsync(long id)
+    public async Task DeleteAsync(long id)
     {
         var post = await GetEntityByIdAsync(id);
 
@@ -67,7 +66,7 @@ public class PostService(
         await _repository.SaveChangesAsync();
     }
 
-    public override async Task<PostResponse> GetByIdAsync(long id)
+    public async Task<PostResponse> GetByIdAsync(long id)
     {
         var post = await GetEntityByIdAsync(id);
 
@@ -100,19 +99,19 @@ public class PostService(
         if (request.HasTitle && request.HasCategory)
         {
             return await _repository
-                .GetAllByTitleContainingAndCategoryNameContainingAsync(
-                    request.Title,
-                    request.Category);
+                .GetAllByTitleAndCategoryNameAsync(request.Title!, request.Category!);
         }
 
         if (request.HasTitle)
         {
-            return await _repository.GetAllByTitleContainingAsync(request.Title);
+            return await _repository
+                .GetAllByTitleAsync(request.Title!);
         }
 
         if (request.HasCategory)
         {
-            return await _repository.GetAllByCategoryNameContainingAsync(request.Category);
+            return await _repository
+                .GetAllByCategoryNameAsync(request.Category!);
         }
 
         return await _repository.GetAllAsync();

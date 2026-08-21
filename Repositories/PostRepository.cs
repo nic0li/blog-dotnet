@@ -35,7 +35,7 @@ public class PostRepository(AppDbContext dbContext) : Repository<Post>(dbContext
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Post>> GetAllByTitleContainingAsync(string title)
+    public async Task<IEnumerable<Post>> GetAllByTitleAsync(string title)
     {
         return await _dbContext.Posts
             .Include(post => post.User)
@@ -45,7 +45,7 @@ public class PostRepository(AppDbContext dbContext) : Repository<Post>(dbContext
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Post>> GetAllByCategoryNameContainingAsync(string category)
+    public async Task<IEnumerable<Post>> GetAllByCategoryNameAsync(string category)
     {
         return await _dbContext.Posts
             .Include(post => post.User)
@@ -55,9 +55,7 @@ public class PostRepository(AppDbContext dbContext) : Repository<Post>(dbContext
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Post>> GetAllByTitleContainingAndCategoryNameContainingAsync(
-        string title,
-        string category)
+    public async Task<IEnumerable<Post>> GetAllByTitleAndCategoryNameAsync(string title, string category)
     {
         return await _dbContext.Posts
             .Include(post => post.User)

@@ -172,7 +172,7 @@ public class CategoryServiceTests
     public async Task UpdateAsync_ShouldUpdateCategoryWithoutChangingName()
     {
         // Arrange
-        var request = new CategoryRequest(null);
+        var request = new CategoryRequest(null!);
         var category = CategoryFactory.Movies();
 
         _repository.Setup(repository =>
@@ -253,8 +253,7 @@ public class CategoryServiceTests
             .ReturnsAsync(categories);
 
         // Act
-        var response =
-            (await _service.GetAllAsync(null)).ToList();
+        var response = (await _service.GetAllAsync(null)).ToList();
 
         // Assert
         Assert.Equal(2, response.Count);
@@ -283,8 +282,7 @@ public class CategoryServiceTests
             .ReturnsAsync(categories);
 
         // Act
-        var response =
-            (await _service.GetAllAsync("   ")).ToList();
+        var response = (await _service.GetAllAsync("   ")).ToList();
 
         // Assert
         Assert.Equal(2, response.Count);
@@ -312,8 +310,9 @@ public class CategoryServiceTests
         var response = (await _service.GetAllAsync("mov")).ToList();
 
         // Assert
-        Assert.Single(response);
-        Assert.Equal("Movies", response[0].Name);
+        var itemResponse = Assert.Single(response);
+        var expected = CategoryFactory.Response();
+        Assert.Equal(expected, itemResponse);
 
         _repository.Verify(repository =>
                 repository.GetAllByNameContainingAsync("mov"), Times.Once);

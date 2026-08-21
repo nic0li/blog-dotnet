@@ -4,15 +4,10 @@ using Blog.Repositories.Interfaces;
 
 namespace Blog.Repositories;
 
-public abstract class Repository<Entity> : IRepository<Entity>
+public abstract class Repository<Entity>(AppDbContext dbContext) : IRepository<Entity>
     where Entity : BaseEntity
 {
-    protected readonly AppDbContext _dbContext;
-
-    public Repository(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    protected readonly AppDbContext _dbContext = dbContext;
 
     public abstract Task<Entity?> GetByIdAsync(long id);
 
@@ -20,20 +15,17 @@ public abstract class Repository<Entity> : IRepository<Entity>
 
     public async Task AddAsync(Entity entity)
     {
-        await _dbContext.Set<Entity>()
-            .AddAsync(entity);
+        await _dbContext.Set<Entity>().AddAsync(entity);
     }
 
     public void Update(Entity entity)
     {
-        _dbContext.Set<Entity>()
-            .Update(entity);
+        _dbContext.Set<Entity>().Update(entity);
     }
 
     public void Delete(Entity entity)
     {
-        _dbContext.Set<Entity>()
-            .Remove(entity);
+        _dbContext.Set<Entity>().Remove(entity);
     }
 
     public async Task SaveChangesAsync()

@@ -5,15 +5,10 @@ using Blog.Services.Interfaces;
 
 namespace Blog.Services;
 
-public class AuthorizationService : IAuthorizationService
+public class AuthorizationService(
+    IAuthenticationService authenticationService) : IAuthorizationService
 {
-    private readonly IAuthenticationService _authenticationService;
-
-    public AuthorizationService(
-        IAuthenticationService authenticationService)
-    {
-        _authenticationService = authenticationService;
-    }
+    private readonly IAuthenticationService _authenticationService = authenticationService;
 
     public async Task<User> GetAuthenticatedUserAsync()
     {
@@ -23,26 +18,19 @@ public class AuthorizationService : IAuthorizationService
 
     public async Task<bool> IsOwnerAsync(User resourceOwner)
     {
-        var authenticatedUser =
-            await GetAuthenticatedUserAsync();
-
-        return IsOwner(resourceOwner, authenticatedUser);
+        return IsOwner(resourceOwner, await GetAuthenticatedUserAsync());
     }
 
     public async Task<bool> IsAdminAsync()
     {
-        var authenticatedUser =
-            await GetAuthenticatedUserAsync();
-
-        return IsAdmin(authenticatedUser);
+        return IsAdmin(await GetAuthenticatedUserAsync());
     }
 
     public async Task ValidateOwnerAsync(User resourceOwner)
     {
         if (!await IsOwnerAsync(resourceOwner))
         {
-            throw new ForbiddenException(
-                "You are not allowed to modify this resource");
+            throw NotAllowed();
         }
     }
 
@@ -55,23 +43,18 @@ public class AuthorizationService : IAuthorizationService
         }
     }
 
-    public async Task ValidateOwnerOrAdminAsync(
-        User resourceOwner)
+    public async Task ValidateOwnerOrAdminAsync(User resourceOwner)
     {
-        var authenticatedUser =
-            await GetAuthenticatedUserAsync();
+        var authenticatedUser = await GetAuthenticatedUserAsync();
 
         if (!IsOwner(resourceOwner, authenticatedUser) &&
             !IsAdmin(authenticatedUser))
         {
-            throw new ForbiddenException(
-                "You are not allowed to modify this resource");
+            throw NotAllowed();
         }
     }
 
-    private static bool IsOwner(
-        User resourceOwner,
-        User authenticatedUser)
+    private static bool IsOwner(User resourceOwner, User authenticatedUser)
     {
         return resourceOwner.Id == authenticatedUser.Id;
     }
@@ -79,5 +62,11 @@ public class AuthorizationService : IAuthorizationService
     private static bool IsAdmin(User authenticatedUser)
     {
         return authenticatedUser.Role == UserRole.Admin;
+    }
+
+    private static ForbiddenException NotAllowed()
+    {
+        throw new ForbiddenException(
+            "You are not allowed to modify this resource");
     }
 }

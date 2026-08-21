@@ -13,7 +13,8 @@ public class CategoryController(ICategoryService service) : ControllerBase
     private readonly ICategoryService _service = service;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CategoryResponse>>> GetAll([FromQuery] string? name)
+    public async Task<ActionResult<IEnumerable<CategoryResponse>>> GetAll(
+        [FromQuery] string? name)
     {
         var response = await _service.GetAllAsync(name);
 
