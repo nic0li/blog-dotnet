@@ -1,5 +1,4 @@
-﻿using Blog.DTOs.Comment;
-using Blog.DTOs.Post;
+﻿using Blog.DTOs.Post;
 using Blog.Entities;
 
 namespace Blog.Tests.Factory;
@@ -14,47 +13,32 @@ public static class PostFactory
         return Post("I like drama", "Content");
     }
 
-    public static Post UpdatedPost()
+    public static Post Post(string title, string content)
     {
-        return Post("I love drama", "Updated content");
+        return EntityPost(title, content);
     }
 
-    public static PostRequest CreateRequest()
+    public static PostRequest Request()
     {
-        return new PostRequest("I like drama", "Content", 1L);
+        return Request("I like drama", "Content", 1L);
     }
 
-    public static PostRequest CreateRequestWithoutTitle()
+    public static PostRequest Request(string? title, string? content, long? categoryId)
     {
-        return new PostRequest(null, "Content", 1L);
-    }
-
-    public static PostRequest CreateRequestWithoutContent()
-    {
-        return new PostRequest("I like drama", null, 1L);
-    }
-
-    public static PostRequest CreateRequestWithoutCategory()
-    {
-        return new PostRequest("I like drama", "Content", null);
-    }
-
-    public static PostRequest UpdateRequest()
-    {
-        return new PostRequest("I love drama", "Updated content", 1L);
+        return PostRequest(title, content, categoryId);
     }
 
     public static PostResponse Response()
     {
-        return Response("I like drama", "Content", []);
+        return Response("I like drama", "Content");
     }
 
-    public static PostResponse UpdatedResponse()
+    public static PostResponse Response(string title, string content)
     {
-        return Response("I love drama", "Updated content", []);
+        return PostResponse(title, content);
     }
 
-    private static Post Post(string title, string content)
+    private static Post EntityPost(string title, string content)
     {
         return new Post
         {
@@ -69,7 +53,12 @@ public static class PostFactory
         };
     }
 
-    private static PostResponse Response(string title, string content, List<CommentResponse>? comments)
+    private static PostRequest PostRequest(string? title, string? content, long? categoryId)
+    {
+        return new PostRequest(title, content, categoryId);
+    }
+
+    private static PostResponse PostResponse(string title, string content)
     {
         return new PostResponse(1L,
             title,
@@ -78,6 +67,6 @@ public static class PostFactory
             MockDate,
             CategoryFactory.Response(),
             UserFactory.ProfileResponse(),
-            comments);
+            []);
     }
 }

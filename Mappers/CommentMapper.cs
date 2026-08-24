@@ -16,7 +16,7 @@ public static class CommentMapper
 
     public static void UpdateEntity(Comment comment, CommentRequest request)
     {
-        if (request.Content is not null)
+        if (!string.IsNullOrWhiteSpace(request.Content))
         {
             comment.Content = request.Content;
         }
@@ -27,14 +27,10 @@ public static class CommentMapper
         return ToResponse(comment, true);
     }
 
-    public static CommentResponse ToResponseWithoutPost(Comment comment)
+    public static List<CommentResponse> ToListResponse(
+        IEnumerable<Comment> comments)
     {
-        return ToResponse(comment, false);
-    }
-
-    public static List<CommentResponse> ToListResponseWithoutPost(IEnumerable<Comment> comments)
-    {
-        return [.. comments.Select(ToResponseWithoutPost)];
+        return [.. comments.Select(comment => ToResponse(comment, false))];
     }
 
     private static CommentResponse ToResponse(Comment comment, bool includePost)

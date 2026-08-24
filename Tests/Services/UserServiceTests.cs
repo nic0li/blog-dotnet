@@ -401,7 +401,7 @@ public class UserServiceTests
     public async Task UpdateAuthenticatedAsync_ShouldUpdateAuthenticatedUserSuccessfully()
     {
         // Arrange
-        var request = UserFactory.UpdateRequest();
+        var request = UserFactory.UpdateRequest("mariasilva@email.com");
         var user = UserFactory.User();
 
         _authorizationService.Setup(authorizationService =>
@@ -436,7 +436,7 @@ public class UserServiceTests
     public async Task UpdateAuthenticatedAsync_ShouldUpdateAuthenticatedUserWithNullEmail()
     {
         // Arrange
-        var request = UserFactory.UpdateRequestNullEmail();
+        var request = UserFactory.UpdateRequest(null);
         var user = UserFactory.User();
 
         _authorizationService.Setup(authorizationService =>
@@ -464,7 +464,7 @@ public class UserServiceTests
     public async Task UpdateAuthenticatedAsync_ShouldUpdateAuthenticatedUserWithSameEmail()
     {
         // Arrange
-        var request = UserFactory.UpdateRequestSameEmail();
+        var request = UserFactory.UpdateRequest("maria@email.com");
         var user = UserFactory.User();
 
         _authorizationService.Setup(authorizationService =>
@@ -499,7 +499,7 @@ public class UserServiceTests
     public async Task UpdateAuthenticatedAsync_ShouldUpdateAuthenticatedUserWithEmailEmpty()
     {
         // Arrange
-        var request = UserFactory.UpdateRequestEmptyEmail();
+        var request = UserFactory.UpdateRequest("");
         var user = UserFactory.User();
 
         _authorizationService.Setup(authorizationService =>
@@ -530,7 +530,7 @@ public class UserServiceTests
     public async Task UpdateAuthenticatedAsync_ShouldUpdateAuthenticatedUserWithoutEmailField()
     {
         // Arrange
-        var request = UserFactory.UpdateRequestWithoutEmail();
+        var request = UserFactory.UpdateRequest();
         var user = UserFactory.User();
 
         _authorizationService.Setup(authorizationService =>
@@ -558,10 +558,76 @@ public class UserServiceTests
     }
 
     [Fact]
+    public async Task UpdateAuthenticatedAsync_ShouldUpdateAuthenticatedUserWithBlankNamePhotoAndBio()
+    {
+        // Arrange
+        var request = UserFactory.UpdateRequestWithBlankFields();
+        var user = UserFactory.User();
+
+        _authorizationService.Setup(authorizationService =>
+                authorizationService.GetAuthenticatedUserAsync())
+            .ReturnsAsync(user);
+
+        // Act
+        var response = await _service.UpdateAuthenticatedAsync(request);
+
+        // Assert
+        var expected = UserFactory.UpdatedResponseWithBlankFields();
+        Assert.Equal(expected, response);
+
+        _authorizationService.Verify(authorizationService =>
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
+
+        _repository.Verify(repository =>
+                repository.GetByEmailAsync(It.IsAny<string>()), Times.Never);
+
+        _repository.Verify(repository =>
+                repository.Update(user), Times.Once);
+
+        _repository.Verify(repository =>
+                repository.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateAuthenticatedAsync_ShouldUpdateAuthenticatedUserWithNullNamePhotoAndBio()
+    {
+        // Arrange
+        var request = UserFactory.UpdateRequestWithNullFields();
+        var user = UserFactory.User();
+
+        _authorizationService.Setup(authorizationService =>
+                authorizationService.GetAuthenticatedUserAsync())
+            .ReturnsAsync(user);
+
+        _repository.Setup(repository =>
+                repository.GetByEmailAsync("mariasilva@email.com"))
+            .ReturnsAsync((User?)null);
+
+        // Act
+        var response = await _service.UpdateAuthenticatedAsync(request);
+
+        // Assert
+        var expected = UserFactory.UpdatedResponseWithNullFields();
+        Assert.Equal(expected, response);
+
+        _authorizationService.Verify(authorizationService =>
+                authorizationService.GetAuthenticatedUserAsync(), Times.Once);
+
+        _repository.Verify(repository =>
+                repository.GetByEmailAsync("mariasilva@email.com"), Times.Once);
+
+        _repository.Verify(repository =>
+                repository.Update(user), Times.Once);
+
+        _repository.Verify(repository =>
+                repository.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
     public async Task UpdateAuthenticatedAsync_ShouldThrowWhenEmailAlreadyBelongsToAnotherUser()
     {
         // Arrange
-        var request = UserFactory.UpdateRequest();
+        var request = UserFactory.UpdateRequest("ana@email.com");
         var user = UserFactory.User();
         var admin = UserFactory.Admin();
 
@@ -570,7 +636,7 @@ public class UserServiceTests
             .ReturnsAsync(user);
 
         _repository.Setup(repository =>
-                repository.GetByEmailAsync("mariasilva@email.com"))
+                repository.GetByEmailAsync("ana@email.com"))
             .ReturnsAsync(admin);
 
         // Act / Assert
@@ -581,7 +647,7 @@ public class UserServiceTests
                 authorizationService.GetAuthenticatedUserAsync(), Times.Once);
 
         _repository.Verify(repository =>
-                repository.GetByEmailAsync("mariasilva@email.com"), Times.Once);
+                repository.GetByEmailAsync("ana@email.com"), Times.Once);
 
         _repository.Verify(repository =>
                 repository.Update(It.IsAny<User>()), Times.Never);

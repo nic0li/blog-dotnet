@@ -10,22 +10,12 @@ public static class CommentFactory
 
     public static Comment Comment()
     {
-        return Comment("Great post!");
+        return EntityComment();
     }
 
-    public static Comment UpdatedComment()
+    public static CommentRequest Request(string content)
     {
-        return Comment("Updated comment!");
-    }
-
-    public static CommentRequest Request()
-    {
-        return new CommentRequest("Great post!");
-    }
-
-    public static CommentRequest UpdateRequest()
-    {
-        return new CommentRequest("Updated comment!");
+        return CommentRequest(content);
     }
 
     public static CommentResponse Response()
@@ -33,17 +23,17 @@ public static class CommentFactory
         return Response("Great post!");
     }
 
-    public static CommentResponse UpdatedResponse()
+    public static CommentResponse Response(string content)
     {
-        return Response("Updated comment!");
+        return CommentResponse(content);
     }
 
-    private static Comment Comment(string content)
+    private static Comment EntityComment()
     {
         return new Comment
         {
             Id = 1L,
-            Content = content,
+            Content = "Great post!",
             User = UserFactory.User(),
             Post = PostFactory.Post(),
             CreatedAt = MockDate,
@@ -51,13 +41,14 @@ public static class CommentFactory
         };
     }
 
-    private static CommentResponse Response(string content)
+    private static CommentRequest CommentRequest(String content)
     {
-        return new CommentResponse(1L,
-            content,
-            MockDate,
-            MockDate,
-            UserFactory.ProfileResponse(),
-            PostFactory.Response());
+        return new CommentRequest(content);
+    }
+
+    private static CommentResponse CommentResponse(string content)
+    {
+        return new CommentResponse(1L, content, MockDate, MockDate, 
+            UserFactory.ProfileResponse(), PostFactory.Response());
     }
 }

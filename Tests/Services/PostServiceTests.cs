@@ -32,7 +32,7 @@ public class PostServiceTests
     public async Task CreateAsync_ShouldCreatePostSuccessfully()
     {
         // Arrange
-        var request = PostFactory.CreateRequest();
+        var request = PostFactory.Request();
         var post = PostFactory.Post();
 
         _categoryService.Setup(categoryService =>
@@ -79,7 +79,7 @@ public class PostServiceTests
     public async Task CreateAsync_ShouldThrowWhenTitleIsMissing()
     {
         // Arrange
-        var request = PostFactory.CreateRequestWithoutTitle();
+        var request = PostFactory.Request(null!, "Content", 1L);
 
         // Act / Assert
         var exception = await Assert.ThrowsAsync<BadRequestException>(
@@ -98,7 +98,7 @@ public class PostServiceTests
     public async Task CreateAsync_ShouldThrowWhenContentIsMissing()
     {
         // Arrange
-        var request = PostFactory.CreateRequestWithoutContent();
+        var request = PostFactory.Request("I like drama", null!, 1L);
 
         // Act / Assert
         var exception = await Assert.ThrowsAsync<BadRequestException>(
@@ -117,7 +117,7 @@ public class PostServiceTests
     public async Task CreateAsync_ShouldThrowWhenCategoryIsMissing()
     {
         // Arrange
-        var request = PostFactory.CreateRequestWithoutCategory();
+        var request = PostFactory.Request("I like drama", "Content", null);
 
         // Act / Assert
         var exception = await Assert.ThrowsAsync<BadRequestException>(
@@ -136,7 +136,7 @@ public class PostServiceTests
     public async Task UpdateAsync_ShouldUpdatePostSuccessfully()
     {
         // Arrange
-        var request = PostFactory.UpdateRequest();
+        var request = PostFactory.Request("I love drama", "Updated content", 1L);
         var post = PostFactory.Post();
 
         _repository.Setup(repository =>
@@ -155,7 +155,7 @@ public class PostServiceTests
         var response = await _service.UpdateAsync(1L, request);
 
         // Assert
-        var expected = PostFactory.UpdatedResponse();
+        var expected = PostFactory.Response("I love drama", "Updated content");
         Assert.Equivalent(expected, response);
 
         _repository.Verify(repository =>

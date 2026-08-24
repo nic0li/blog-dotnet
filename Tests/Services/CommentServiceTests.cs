@@ -32,7 +32,7 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldCreateCommentSuccessfully()
     {
         // Arrange
-        var request = CommentFactory.Request();
+        var request = CommentFactory.Request("Great post!");
         var comment = CommentFactory.Comment();
         var post = PostFactory.Post();
 
@@ -76,10 +76,41 @@ public class CommentServiceTests
     }
 
     [Fact]
+    public async Task UpdateAsync_ShouldUpdateCommentWithNullContent()
+    {
+        // Arrange
+        var request = CommentFactory.Request(null!);
+        var comment = CommentFactory.Comment();
+
+        _repository.Setup(repository =>
+                repository.GetByIdAsync(1L))
+            .ReturnsAsync(comment);
+
+        // Act
+        var response = await _service.UpdateAsync(1L, request);
+
+        // Assert
+        var expected = CommentFactory.Response();
+        Assert.Equivalent(expected, response);
+
+        _repository.Verify(repository =>
+                repository.GetByIdAsync(1L), Times.Once);
+
+        _authorizationService.Verify(authorizationService =>
+                authorizationService.ValidateOwnerAsync(comment.User), Times.Once);
+
+        _repository.Verify(repository =>
+                repository.Update(comment), Times.Once);
+
+        _repository.Verify(repository =>
+                repository.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
     public async Task UpdateAsync_ShouldUpdateCommentSuccessfully()
     {
         // Arrange
-        var request = CommentFactory.UpdateRequest();
+        var request = CommentFactory.Request("Updated comment!");
         var comment = CommentFactory.Comment();
 
         _repository.Setup(repository =>
@@ -94,7 +125,7 @@ public class CommentServiceTests
         var response = await _service.UpdateAsync(1L, request);
 
         // Assert
-        var expected = CommentFactory.UpdatedResponse();
+        var expected = CommentFactory.Response("Updated comment!");
         Assert.Equivalent(expected, response);
 
         _repository.Verify(repository =>

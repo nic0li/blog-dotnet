@@ -18,12 +18,12 @@ public static class PostMapper
 
     public static void UpdateEntity(Post post, PostRequest request)
     {
-        if (request.Title is not null)
+        if (!string.IsNullOrWhiteSpace(request.Title))
         {
             post.Title = request.Title;
         }
 
-        if (request.Content is not null)
+        if (!string.IsNullOrWhiteSpace(request.Content))
         {
             post.Content = request.Content;
         }
@@ -32,7 +32,7 @@ public static class PostMapper
     public static PostResponse ToResponse(Post post)
     {
         return ToResponse(post,
-            [.. CommentMapper.ToListResponseWithoutPost(post.Comments)]);
+            [.. CommentMapper.ToListResponse(post.Comments)]);
     }
 
     public static PostResponse ToResponseWithoutComments(Post post)

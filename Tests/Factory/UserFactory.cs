@@ -8,60 +8,77 @@ public static class UserFactory
 {
     public static User User()
     {
-        return User(1L,
-            "maria@email.com", "Maria", UserRole.User);
+        return User(1L, "maria@email.com", "Maria", UserRole.User);
     }
 
     public static User Admin()
     {
-        return User(2L,
-            "ana@email.com", "Ana", UserRole.Admin);
+        return User(2L, "ana@email.com", "Ana", UserRole.Admin);
     }
 
     public static UserCreateRequest CreateRequest()
     {
-        return new UserCreateRequest(
-            "maria@email.com", "123456", "Maria");
+        return new UserCreateRequest("maria@email.com", "123456", "Maria");
     }
 
     public static UserUpdateRequest UpdateRequest()
     {
-        return UserUpdateRequest("mariasilva@email.com");
+        return new UserUpdateRequest
+        {
+            Name = "Maria Silva",
+            Photo = "photo.jpg",
+            Bio = "dev"
+        };
     }
 
-    public static UserUpdateRequest UpdateRequestSameEmail()
+    public static UserUpdateRequest UpdateRequest(string? email)
     {
-        return UserUpdateRequest("maria@email.com");
+        var request = UpdateRequest();
+        request.Email = email;
+        return request;
     }
 
-    public static UserUpdateRequest UpdateRequestNullEmail()
+    public static UserUpdateRequest UpdateRequestWithBlankFields()
     {
-        return UserUpdateRequest(null);
+        return new UserUpdateRequest
+        {
+            Name = "   ",
+            Photo = "   ",
+            Bio = "   "
+        };
     }
 
-    public static UserUpdateRequest UpdateRequestEmptyEmail()
+    public static UserUpdateRequest UpdateRequestWithNullFields()
     {
-        return UserUpdateRequest(string.Empty);
-    }
-
-    public static UserUpdateRequest UpdateRequestWithoutEmail()
-    {
-        return UserUpdateRequest();
+        return new UserUpdateRequest
+        {
+            Email = "mariasilva@email.com"
+        };
     }
 
     public static UserResponse Response()
     {
-        return UserResponse("maria@email.com", "Maria", null);
+        return UserResponse("maria@email.com", "Maria", null, null);
     }
 
     public static UserResponse UpdatedResponse()
     {
-        return UserResponse("mariasilva@email.com", "Maria Silva", "dev");
+        return UserResponse("mariasilva@email.com", "Maria Silva", "photo.jpg", "dev");
     }
 
     public static UserResponse UpdatedResponseSameEmail()
     {
-        return UserResponse("maria@email.com", "Maria Silva", "dev");
+        return UserResponse("maria@email.com", "Maria Silva", "photo.jpg", "dev");
+    }
+
+    public static UserResponse UpdatedResponseWithBlankFields()
+    {
+        return UserResponse("maria@email.com", null, null, null);
+    }
+
+    public static UserResponse UpdatedResponseWithNullFields()
+    {
+        return UserResponse("mariasilva@email.com", "Maria", null, null);
     }
 
     public static UserProfileResponse ProfileResponse()
@@ -69,8 +86,7 @@ public static class UserFactory
         return new UserProfileResponse(1L, "Maria", null, null);
     }
 
-    private static User User(
-        long id, string email, string name, UserRole role)
+    private static User User(long id, string email, string name, UserRole role)
     {
         return new User
         {
@@ -82,26 +98,8 @@ public static class UserFactory
         };
     }
 
-    private static UserUpdateRequest UserUpdateRequest(String? email)
+    private static UserResponse UserResponse(string email, string? name, string? photo, string? bio)
     {
-        UserUpdateRequest request = UserUpdateRequest();
-        request.Email = email;
-        return request;
-    }
-
-    private static UserUpdateRequest UserUpdateRequest()
-    {
-        return new UserUpdateRequest
-        {
-            Name = "Maria Silva",
-            Photo = null,
-            Bio = "dev"
-        };
-    }
-
-    private static UserResponse UserResponse(
-        string email, string? name, string? bio)
-    {
-        return new UserResponse(1L, email, name, null, bio, UserRole.User);
+        return new UserResponse(1L, email, name, photo, bio, UserRole.User);
     }
 }
